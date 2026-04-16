@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Module Card — matches Stitch Dashboard design (project 14320903288817197372)
+    • Light tinted card background per module (set via cardBackgroundColor in adapter)
+    • 16dp corner radius, no stroke, subtle elevation
+    • Top row: Icon chip (left) + Status badge pill (right)
+    • Middle: Bold title (18sp) + 2-line description (14sp, muted)
+    • Bottom row: Circular user avatars (left) + "Analyze ›" link (right)
+-->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="15dp"
+    android:layout_marginBottom="10dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="#F5F7FF">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+
+        <!-- Module icon container (small rounded square) -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/iconContainer"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="#002E88"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:id="@+id/ivModuleIcon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="center"
+                android:src="@android:drawable/ic_menu_manage"
+                android:contentDescription="Module icon"
+                app:tint="#FFFFFF" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Status badge pill (STABLE / BETA / TESTING / INTERNAL) -->
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tvStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_status_badge"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp"
+            android:textColor="#FFFFFF"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.06"
+            android:maxLines="1"
+            tools:text="STABLE"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/iconContainer"
+            app:layout_constraintBottom_toBottomOf="@id/iconContainer" />
+
+        <!-- ===== MODULE NAME ===== -->
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tvModuleName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#1A1C1E"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            tools:text="HRMS"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iconContainer" />
+
+        <!-- ===== MODULE DESCRIPTION ===== -->
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tvModuleDesc"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:ellipsize="end"
+            android:lineSpacingExtra="3dp"
+            android:maxLines="2"
+            android:textColor="#44474E"
+            android:textSize="14sp"
+            tools:text="Human Resource Management system core payroll and attendance engine."
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvModuleName" />
+
+        <!-- ===== BOTTOM ROW: Avatars (left) + Analyze link (right) ===== -->
+
+        <!-- Stacked user avatar circles -->
+        <FrameLayout
+            android:id="@+id/avatarsRow"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvModuleDesc"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <!-- Avatar 1 (back) -->
+            <ImageView
+                android:id="@+id/ivAvatar1"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginStart="0dp"
+                android:src="@drawable/shadow_profile"
+                android:background="@drawable/bg_avatar_circle"
+                android:scaleType="centerCrop" />
+
+            <!-- Avatar 2 (middle) -->
+            <ImageView
+                android:id="@+id/ivAvatar2"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginStart="18dp"
+                android:src="@drawable/userprofile"
+                android:background="@drawable/bg_avatar_circle"
+                android:scaleType="centerCrop" />
+
+            <!-- Avatar 3 (front) -->
+            <ImageView
+                android:id="@+id/ivAvatar3"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginStart="36dp"
+                android:src="@drawable/shadow_profile"
+                android:background="@drawable/bg_avatar_circle"
+                android:scaleType="centerCrop"
+                android:visibility="visible" />
+
+        </FrameLayout>
+
+        <!-- "Analyze ›" action link -->
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tvAnalyze"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Analyze ›"
+            android:textColor="#0061A4"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/avatarsRow"
+            app:layout_constraintTop_toTopOf="@id/avatarsRow" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

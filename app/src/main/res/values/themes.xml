@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Base App Theme -->
+    <style name="Theme.PrecisionLayer" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryContainer">@color/primary_container</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/on_surface</item>
+        <item name="colorOnSurfaceVariant">@color/on_surface_variant</item>
+        <item name="colorOutline">@color/outline</item>
+        <item name="colorOutlineVariant">@color/outline_variant</item>
+        <item name="colorError">@color/error</item>
+        <item name="colorTertiary">@color/tertiary</item>
+        <item name="android:windowBackground">@color/surface</item>
+        <item name="android:statusBarColor">@color/surface</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:navigationBarColor">@color/surface</item>
+    </style>
+
+    <!-- Bottom Nav Active Indicator: pill highlight -->
+    <style name="BottomNavActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/surface_container</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.BottomNavIndicator</item>
+    </style>
+
+    <style name="ShapeAppearance.BottomNavIndicator" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <!-- Status Pill Base -->
+    <style name="StatusPillBase">
+        <item name="android:textSize">11sp</item>
+        <item name="android:paddingLeft">12dp</item>
+        <item name="android:paddingRight">12dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
+    </style>
+
+    <!-- Status Pill: Stable -->
+    <style name="StatusPill.Stable" parent="StatusPillBase">
+        <item name="android:textColor">@color/tertiary</item>
+    </style>
+
+    <!-- Status Pill: Issues -->
+    <style name="StatusPill.Issues" parent="StatusPillBase">
+        <item name="android:textColor">@color/error</item>
+    </style>
+
+    <!-- Status Pill: Testing -->
+    <style name="StatusPill.Testing" parent="StatusPillBase">
+        <item name="android:textColor">@color/on_surface_variant</item>
+    </style>
+
+</resources>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav_graph"
+    app:startDestination="@id/dashboardFragment">
+
+    <fragment
+        android:id="@+id/dashboardFragment"
+        android:name="com.example.precisionlayertesting.features.dashboard.DashboardFragment"
+        android:label="Dashboard"
+        tools:layout="@layout/fragment_dashboard"
+        >
+
+
+        <action
+            android:id="@+id/action_dashboard_to_moduleVersions"
+            app:destination="@id/moduleVersionsFragment" />
+        <action
+            android:id="@+id/action_dashboard_to_createModule"
+            app:destination="@id/createModuleFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/moduleVersionsFragment"
+        android:name="com.example.precisionlayertesting.features.dashboard.AppVersionsFragment"
+        android:label="Module Versions"
+        tools:layout="@layout/fragment_app_version"
+
+        >
+
+        <argument
+            android:name="moduleId"
+            app:argType="string" />
+        <argument
+            android:name="moduleName"
+            app:argType="string" />
+
+        <action
+            android:id="@+id/action_app_version_to_bugTracking"
+            app:destination="@id/bugTrackingFragment" />
+        <action
+            android:id="@+id/action_moduleVersions_to_createVersion"
+            app:destination="@id/createVersionFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/bugTrackingFragment"
+        android:name="com.example.precisionlayertesting.features.bug.BugTrackingFragment"
+        android:label="Bug Tracking"
+        tools:layout="@layout/fragment_bug_tracking"
+
+        >
+
+        <argument
+            android:name="moduleId"
+            app:argType="string" />
+        <argument
+            android:name="versionId"
+            app:argType="string" />
+        <argument
+            android:name="moduleName"
+            app:argType="string" />
+        <argument
+            android:name="versionName"
+            app:argType="string" />
+
+        <action
+            android:id="@+id/action_bugTracking_to_bugReports"
+            app:destination="@id/bugReportsFragment" />
+        <action
+            android:id="@+id/action_bugTrackingFragment_to_reportBugFormFragment"
+            app:destination="@id/reportBugFormFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/bugReportsFragment"
+        android:name="com.example.precisionlayertesting.features.bug.BugReportsFragment"
+        android:label="Bug Reports"
+        tools:layout="@layout/fragment_bug_reports" >
+        <argument
+            android:name="moduleId"
+            app:argType="string" />
+        <argument
+            android:name="versionId"
+            app:argType="string" />
+        <argument
+            android:name="sessionId"
+            app:argType="string" />
+        <argument
+            android:name="moduleName"
+            app:argType="string" />
+        <argument
+            android:name="versionName"
+            app:argType="string" />
+        <argument
+            android:name="sessionTitle"
+            app:argType="string" />
+
+        <action
+            android:id="@+id/action_bugReports_to_bugDetails"
+            app:destination="@id/reportedBugDetailsFragment" />
+        <action
+            android:id="@+id/action_bugReportsFragment_to_reportBugFormFragment"
+            app:destination="@id/reportBugFormFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/reportedBugDetailsFragment"
+        android:name="com.example.precisionlayertesting.features.bug.ReportedBugDetailsFragment"
+        android:label="Reported Bug Details"
+        tools:layout="@layout/fragment_reported_bug_details">
+        <argument
+            android:name="bugDetail"
+            app:argType="com.example.precisionlayertesting.data.models.bug.BugReport" />
+        <argument
+            android:name="breadcrumb"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/reportBugFormFragment"
+        android:name="com.example.precisionlayertesting.features.bug.ReportBugFormFragment"
+        android:label="Report New Bug"
+        tools:layout="@layout/fragment_report_bug_form" />
+
+    <fragment
+        android:id="@+id/createVersionFragment"
+        android:name="com.example.precisionlayertesting.features.bug.CreateVersionFragment"
+        android:label="Create Version"
+        tools:layout="@layout/fragment_create_version">
+        <argument
+            android:name="moduleId"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/createModuleFragment"
+        android:name="com.example.precisionlayertesting.features.bug.CreateModuleFragment"
+        android:label="Create Module"
+        tools:layout="@layout/fragment_create_module" />
+
+</navigation>

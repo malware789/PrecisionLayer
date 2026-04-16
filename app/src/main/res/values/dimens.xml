@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Spacing -->
+    <dimen name="spacing_xs">4dp</dimen>
+    <dimen name="spacing_sm">8dp</dimen>
+    <dimen name="spacing_md">12dp</dimen>
+    <dimen name="spacing_lg">16dp</dimen>
+    <dimen name="spacing_xl">20dp</dimen>
+    <dimen name="spacing_xxl">24dp</dimen>
+    <dimen name="spacing_xxxl">28dp</dimen>
+
+    <!-- Corner radii -->
+    <dimen name="corner_sm">8dp</dimen>
+    <dimen name="corner_md">14dp</dimen>
+    <dimen name="corner_lg">20dp</dimen>
+    <dimen name="corner_xl">24dp</dimen>
+    <dimen name="corner_pill">100dp</dimen>
+
+    <!-- Header -->
+    <dimen name="header_height">56dp</dimen>
+    <dimen name="header_padding_horizontal">20dp</dimen>
+    <dimen name="avatar_size">36dp</dimen>
+    <dimen name="avatar_border_width">2dp</dimen>
+
+    <!-- Search bar -->
+    <dimen name="search_bar_height">48dp</dimen>
+    <dimen name="search_bar_margin_horizontal">20dp</dimen>
+    <dimen name="search_bar_margin_top">16dp</dimen>
+    <dimen name="search_icon_size">20dp</dimen>
+
+    <!-- Module cards -->
+    <dimen name="card_padding">20dp</dimen>
+    <dimen name="card_margin_horizontal">16dp</dimen>
+    <dimen name="card_margin_bottom">12dp</dimen>
+    <dimen name="card_corner_radius">20dp</dimen>
+    <dimen name="module_icon_size">48dp</dimen>
+    <dimen name="module_icon_inner_size">26dp</dimen>
+    <dimen name="team_avatar_size">30dp</dimen>
+    <dimen name="team_avatar_overlap">8dp</dimen>
+    <dimen name="team_avatar_border">2dp</dimen>
+    <dimen name="analyze_arrow_size">16dp</dimen>
+
+    <!-- Request module -->
+    <dimen name="request_module_padding">28dp</dimen>
+    <dimen name="request_plus_circle_size">52dp</dimen>
+    <dimen name="request_plus_icon_size">28dp</dimen>
+
+    <!-- Precision Metrix -->
+    <dimen name="metrix_section_padding">24dp</dimen>
+    <dimen name="metrix_section_corner">24dp</dimen>
+    <dimen name="metrix_card_corner">16dp</dimen>
+    <dimen name="metrix_card_padding">16dp</dimen>
+    <dimen name="metrix_gap">10dp</dimen>
+    <dimen name="chart_height">140dp</dimen>
+    <dimen name="chart_icon_size">64dp</dimen>
+
+    <!-- Bottom navigation -->
+    <dimen name="bottom_nav_height">80dp</dimen>
+
+    <!-- Typography -->
+    <dimen name="text_overline">11sp</dimen>
+    <dimen name="text_page_title">32sp</dimen>
+    <dimen name="text_section_title">24sp</dimen>
+    <dimen name="text_module_name">22sp</dimen>
+    <dimen name="text_module_desc">13sp</dimen>
+    <dimen name="text_metric_value">36sp</dimen>
+    <dimen name="text_metric_label">10sp</dimen>
+    <dimen name="text_body">14sp</dimen>
+    <dimen name="text_label">13sp</dimen>
+    <dimen name="text_status_pill">11sp</dimen>
+    <dimen name="text_logo">20sp</dimen>
+
+</resources>

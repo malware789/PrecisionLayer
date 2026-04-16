@@ -1,0 +1,10 @@
+package com.example.precisionlayertesting.data.models.auth
+
+import com.google.gson.annotations.SerializedName
+
+data class WorkspaceMemberDetailed(
+    @SerializedName("user_id") val userId: String,
+    @SerializedName("workspace_id") val workspaceId: String,
+    @SerializedName("role") val role: String,
+    @SerializedName("workspaces") val workspace: Workspace
+)

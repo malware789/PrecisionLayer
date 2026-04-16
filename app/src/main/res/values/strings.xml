@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">PrecisionLayer</string>
+
+    <!-- Header -->
+    <string name="logo_text">PrecisionLayer</string>
+    <string name="cd_filter">Filter</string>
+    <string name="cd_avatar">User profile</string>
+
+    <!-- Dashboard titles -->
+    <string name="workspace_overline">WORKSPACE OVERVIEW</string>
+    <string name="dashboard_title">Module Architect</string>
+    <string name="search_hint">Search modules</string>
+
+    <!-- Module names -->
+    <string name="module_hrms">HRMS</string>
+    <string name="module_inventory">Inventory</string>
+    <string name="module_finance">Finance</string>
+    <string name="module_analytics">Analytics</string>
+
+    <!-- Module descriptions -->
+    <string name="desc_hrms">Human Resource Management system core payroll and attendance engine.</string>
+    <string name="desc_inventory">Warehouse management and real-time stock tracking integration.</string>
+    <string name="desc_finance">Ledger reconciliation and multi-currency billing gateways.</string>
+    <string name="desc_analytics">BI reporting tool with advanced data visualization hooks.</string>
+
+    <!-- Status labels -->
+    <string name="status_stable">STABLE</string>
+    <string name="status_testing">TESTING</string>
+    <string name="status_issues">%d ISSUES</string>
+
+    <!-- Actions -->
+    <string name="action_analyze">Analyze</string>
+    <string name="cd_analyze_arrow">Go to analyze</string>
+
+    <!-- Request new module -->
+    <string name="request_module_title">Request New Module</string>
+    <string name="request_module_subtitle">Provision a new testing environment</string>
+    <string name="cd_add">Add</string>
+
+    <!-- Precision Metrix -->
+    <string name="section_precision_metrix">Precision Metrix</string>
+    <string name="metric_pass_rate">98.4%</string>
+    <string name="label_pass_rate">PASS RATE</string>
+    <string name="metric_latency">1.2ms</string>
+    <string name="label_latency">LATENCY</string>
+    <string name="metrix_body">Our automated testing engine has processed over 1,200 deployments this week with surgical precision.</string>
+    <string name="cd_chart">Metrics chart</string>
+
+    <!-- Bottom nav -->
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_modules">Modules</string>
+    <string name="nav_bugs">Bugs</string>
+    <string name="nav_activity">Activity</string>
+
+</resources>
