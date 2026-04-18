@@ -11,6 +11,8 @@ import com.example.precisionlayertesting.data.repository.AppRepository
 import com.example.precisionlayertesting.data.repository.AuthRepository
 import com.example.precisionlayertesting.core.network.PlainHttpClient
 import com.example.precisionlayertesting.core.network.TokenRefreshService
+import com.example.precisionlayertesting.core.utils.ApkMetadataExtractor
+import retrofit2.converter.gson.GsonConverterFactory
 
 object ManualDI {
     // Basic service locator for manual dependency injection
@@ -41,12 +43,27 @@ object ManualDI {
         AuthRepository(authApiService, prefsManager)
     }
 
+    val apkMetadataExtractor: ApkMetadataExtractor by lazy {
+        ApkMetadataExtractor(appContext)
+    }
+
     private val bugApiService: BugApiService by lazy {
         RetrofitClient.retrofit.create(BugApiService::class.java)
     }
 
+    private val r2Retrofit: retrofit2.Retrofit by lazy {
+        retrofit2.Retrofit.Builder()
+            .baseUrl("https://placeholder.com/") // Will be overridden by @Url
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    private val r2ApiService: com.example.precisionlayertesting.data.remote.R2ApiService by lazy {
+        r2Retrofit.create(com.example.precisionlayertesting.data.remote.R2ApiService::class.java)
+    }
+
     val bugRepository: BugRepository by lazy {
-        BugRepository(bugApiService)
+        BugRepository(bugApiService, r2ApiService)
     }
 
     /** Used by RetrofitClient.tokenAuthenticator for synchronous token refresh. */

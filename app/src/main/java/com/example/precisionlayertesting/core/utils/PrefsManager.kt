@@ -3,8 +3,10 @@ package com.example.precisionlayertesting.core.utils
 import android.content.Context
 import android.content.SharedPreferences
 
-class PrefsManager(context: Context) {
+class PrefsManager(private val context: Context) {
     private val prefs: SharedPreferences = context.getSharedPreferences("precision_layer_prefs", Context.MODE_PRIVATE)
+
+    fun getContext(): Context = context
 
     fun saveWorkspaceId(id: String?) {
         prefs.edit().putString("workspace_id", id).apply()

@@ -6,8 +6,14 @@ import com.example.precisionlayertesting.data.remote.BugApiService
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import okhttp3.MediaType
+import okhttp3.RequestBody
+import com.example.precisionlayertesting.data.remote.R2ApiService
 
-class BugRepository(private val apiService: BugApiService) {
+class BugRepository(
+    private val apiService: BugApiService,
+    private val r2ApiService: R2ApiService
+) {
 
     companion object {
         private const val TAG = "BugRepository"
@@ -100,6 +106,105 @@ class BugRepository(private val apiService: BugApiService) {
             }
         } catch (e: Exception) {
             Log.e(TAG, "createVersion exception: ${e.message}", e)
+            Result.Error(e)
+        }
+    }
+
+    suspend fun validateApk(request: ApkValidationRequest): Result<ApkValidationResponse> = withContext(Dispatchers.IO) {
+        try {
+            val response = apiService.validateApk(request)
+            if (response.isSuccessful && response.body() != null) {
+                Result.Success(response.body()!!)
+            } else {
+                val errorBody = response.errorBody()?.string() ?: "Validation failed"
+                Result.Error(Exception(errorBody))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "validateApk exception: ${e.message}", e)
+            Result.Error(e)
+        }
+    }
+
+    suspend fun uploadToR2(
+        url: String, 
+        data: ByteArray, 
+        onProgress: (Long, Long) -> Unit
+    ): Result<Unit> = withContext(Dispatchers.IO) {
+        var lastError: Exception? = null
+        val maxRetries = 1
+        
+        for (attempt in 0..maxRetries) {
+            try {
+                if (attempt > 0) Log.d(TAG, "Retrying upload... Attempt $attempt")
+                
+                val mediaType = MediaType.parse("application/vnd.android.package-archive")
+                val requestBody = ProgressRequestBody(mediaType, data, onProgress)
+                
+                // Use a direct PUT request without explicit header if it might conflict with signature
+                val response = r2ApiService.uploadFile(
+                    uploadUrl = url, 
+                    contentType = "application/vnd.android.package-archive", 
+                    file = requestBody
+                )
+                
+                if (response.isSuccessful) {
+                    Log.d(TAG, "R2 Upload successful")
+                    return@withContext Result.Success(Unit)
+                } else {
+                    val errorCode = response.code()
+                    val errorMsg = response.message()
+                    val errorBody = response.errorBody()?.string() ?: "No error body"
+                    Log.e(TAG, "R2 Upload failed - Code: $errorCode, Msg: $errorMsg, Body: $errorBody")
+                    lastError = Exception("Upload failed ($errorCode): $errorMsg - $errorBody")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Upload attempt $attempt failed: ${e.message}", e)
+                lastError = e
+            }
+            
+            if (attempt < maxRetries) {
+                kotlinx.coroutines.delay(1000L * (attempt + 1))
+            }
+        }
+        
+        Result.Error(lastError ?: Exception("Unknown upload error"))
+    }
+
+    private class ProgressRequestBody(
+        private val contentType: MediaType?,
+        private val data: ByteArray,
+        private val onProgress: (Long, Long) -> Unit
+    ) : RequestBody() {
+        override fun contentType(): MediaType? = contentType
+        override fun contentLength(): Long = data.size.toLong()
+
+        override fun writeTo(sink: okio.BufferedSink) {
+            val total = contentLength()
+            var uploaded = 0L
+            val bufferSize = 2048
+            var offset = 0
+            
+            while (offset < data.size) {
+                val toRead = minOf(bufferSize, data.size - offset)
+                sink.write(data, offset, toRead)
+                offset += toRead
+                uploaded += toRead
+                onProgress(uploaded, total)
+            }
+        }
+    }
+
+    suspend fun confirmUpload(request: ConfirmUploadRequest): Result<AppVersion> = withContext(Dispatchers.IO) {
+        try {
+            val response = apiService.confirmUpload(request)
+            if (response.isSuccessful && response.body() != null) {
+                Result.Success(response.body()!!)
+            } else {
+                val errorBody = response.errorBody()?.string() ?: "Confirmation failed"
+                Result.Error(Exception(errorBody))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "confirmUpload exception: ${e.message}", e)
             Result.Error(e)
         }
     }

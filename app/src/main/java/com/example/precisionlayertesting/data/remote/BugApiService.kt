@@ -58,4 +58,14 @@ interface BugApiService {
         @Header("Prefer") prefer: String = "return=representation",
         @Body request: AppVersionCreateRequest
     ): Response<List<AppVersion>>
+
+    @POST("functions/v1/validate-apk")
+    suspend fun validateApk(
+        @Body request: ApkValidationRequest
+    ): Response<ApkValidationResponse>
+
+    @POST("functions/v1/confirm-upload")
+    suspend fun confirmUpload(
+        @Body request: ConfirmUploadRequest
+    ): Response<AppVersion>
 }

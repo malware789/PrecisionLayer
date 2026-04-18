@@ -8,6 +8,7 @@ import kotlinx.parcelize.Parcelize
 data class Module(
     @SerializedName("id") val id: String,
     @SerializedName("name") val name: String,
+    @SerializedName("package_name") val packageName: String,
     @SerializedName("workspace_id") val workspaceId: String,
     @SerializedName("description") val description: String? = null,
     @SerializedName("created_at") val createdAt: String? = null
@@ -15,6 +16,7 @@ data class Module(
 
 data class ModuleCreateRequest(
     @SerializedName("name") val name: String,
+    @SerializedName("package_name") val packageName: String,
     @SerializedName("description") val description: String?,
     @SerializedName("workspace_id") val workspaceId: String
 )
@@ -25,9 +27,35 @@ data class AppVersionCreateRequest(
     @SerializedName("version_name") val versionName: String,
     @SerializedName("version_code") val versionCode: Int,
     @SerializedName("build_number") val buildNumber: Int,
+    @SerializedName("version_title") val versionTitle: String,
     @SerializedName("release_notes") val releaseNotes: String? = null,
     @SerializedName("file_url") val fileUrl: String? = null,
     @SerializedName("created_by") val createdBy: String
+)
+
+data class ApkValidationRequest(
+    @SerializedName("module_id") val moduleId: String,
+    @SerializedName("version_name") val versionName: String,
+    @SerializedName("version_code") val versionCode: Int,
+    @SerializedName("package_name") val packageName: String
+)
+
+data class ApkValidationResponse(
+    @SerializedName("valid") val valid: Boolean,
+    @SerializedName("upload_url") val uploadUrl: String? = null,
+    @SerializedName("file_path") val filePath: String? = null
+)
+
+data class ConfirmUploadRequest(
+    @SerializedName("module_id") val moduleId: String,
+    @SerializedName("version_name") val versionName: String,
+    @SerializedName("version_code") val versionCode: Int,
+    @SerializedName("package_name") val packageName: String,
+    @SerializedName("file_path") val filePath: String,
+    @SerializedName("file_size") val fileSize: Long,
+    @SerializedName("file_type") val fileType: String = "apk",
+    @SerializedName("version_title") val versionTitle: String,
+    @SerializedName("release_notes") val releaseNotes: String? = null
 )
 
 @Parcelize
@@ -38,6 +66,7 @@ data class AppVersion(
     @SerializedName("version_name") val versionName: String,
     @SerializedName("version_code") val versionCode: Int,
     @SerializedName("build_number") val buildNumber: Int,
+    @SerializedName("version_title") val versionTitle: String,
     @SerializedName("release_notes") val releaseNotes: String? = null,
     @SerializedName("file_url") val fileUrl: String? = null,
     @SerializedName("created_by") val createdBy: String? = null,

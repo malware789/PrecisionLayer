@@ -25,9 +25,9 @@ class AppVersionAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
         with(holder.binding) {
-            val display = "${item.versionName} (b${item.buildNumber})"
+            val display = "${item.versionName}\n(B${item.buildNumber})"
             tvVersionNumber.text = display
-            tvBuildTitle.text = "Code: ${item.versionCode}"
+            tvBuildTitle.text = item.versionTitle
             tvDate.text = item.createdAt?.split("T")?.firstOrNull() ?: "Recent"
             tvTeam.text = "Engineering" 
             tvDescription.text = item.releaseNotes ?: "Testing build for version ${item.versionName}"

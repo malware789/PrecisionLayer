@@ -24,7 +24,7 @@ class CreateModuleViewModel(
     private val _createState = MutableLiveData<Result<Module>>()
     val createState: LiveData<Result<Module>> = _createState
 
-    fun createModule(name: String, description: String) {
+    fun createModule(name: String, packageName: String, description: String) {
         val workspaceId = prefsManager.getWorkspaceId()
         if (workspaceId.isNullOrBlank()) {
             _createState.value = Result.Error(Exception("No workspace selected. Please select a workspace first."))
@@ -35,6 +35,7 @@ class CreateModuleViewModel(
             _createState.value = Result.Loading
             val request = ModuleCreateRequest(
                 name = name.trim(),
+                packageName = packageName.trim(),
                 description = description.trim().takeIf { it.isNotEmpty() },
                 workspaceId = workspaceId
             )

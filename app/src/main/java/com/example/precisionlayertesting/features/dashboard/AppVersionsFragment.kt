@@ -27,7 +27,11 @@ class AppVersionsFragment : Fragment() {
         ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
                 @Suppress("UNCHECKED_CAST")
-                return VersionViewModel(ManualDI.bugRepository, ManualDI.prefsManager) as T
+                return VersionViewModel(
+                    ManualDI.bugRepository, 
+                    ManualDI.prefsManager,
+                    ManualDI.apkMetadataExtractor
+                ) as T
             }
         })[VersionViewModel::class.java]
     }

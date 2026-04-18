@@ -45,23 +45,32 @@ class CreateModuleFragment : Fragment() {
     }
 
     private fun setupInputWatcher() {
-        binding.etModuleName.addTextChangedListener(object : TextWatcher {
+        val watcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val hasName = !s.isNullOrBlank()
-                binding.btnCreateModule.isEnabled = hasName
-                binding.btnCreateModule.alpha = if (hasName) 1.0f else 0.5f
-                // Clear error on typing
+                val hasName = !binding.etModuleName.text.isNullOrBlank()
+                val hasPackage = !binding.etPackageName.text.isNullOrBlank()
+                val isEnabled = hasName && hasPackage
+                
+                binding.btnCreateModule.isEnabled = isEnabled
+                binding.btnCreateModule.alpha = if (isEnabled) 1.0f else 0.5f
+                
+                // Clear errors on typing
                 if (hasName) binding.tilModuleName.error = null
+                if (hasPackage) binding.tilPackageName.error = null
             }
             override fun afterTextChanged(s: Editable?) {}
-        })
+        }
+
+        binding.etModuleName.addTextChangedListener(watcher)
+        binding.etPackageName.addTextChangedListener(watcher)
     }
 
     private fun setupClickListeners() {
         binding.btnCreateModule.setOnClickListener {
-            val name = binding.etModuleName.text.toString()
-            val description = binding.etDescription.text.toString()
+            val name = binding.etModuleName.text.toString().trim()
+            val packageName = binding.etPackageName.text.toString().trim()
+            val description = binding.etDescription.text.toString().trim()
 
             if (name.isBlank()) {
                 binding.tilModuleName.error = "Module name is required"
@@ -69,7 +78,21 @@ class CreateModuleFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            viewModel.createModule(name, description)
+            if (packageName.isBlank()) {
+                binding.tilPackageName.error = "Package name is required"
+                binding.etPackageName.requestFocus()
+                return@setOnClickListener
+            }
+            
+            // Simple package name validation regex
+            val packageRegex = "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$".toRegex()
+            if (!packageRegex.matches(packageName)) {
+                binding.tilPackageName.error = "Invalid package name format (e.g. com.example.app)"
+                binding.etPackageName.requestFocus()
+                return@setOnClickListener
+            }
+
+            viewModel.createModule(name, packageName, description)
         }
     }
 
@@ -81,6 +104,7 @@ class CreateModuleFragment : Fragment() {
                     binding.btnCreateModule.isEnabled = false
                     binding.btnCreateModule.text = "Creating..."
                     binding.etModuleName.isEnabled = false
+                    binding.etPackageName.isEnabled = false
                     binding.etDescription.isEnabled = false
                 }
                 is Result.Success -> {
@@ -97,6 +121,7 @@ class CreateModuleFragment : Fragment() {
                     binding.btnCreateModule.alpha = 1.0f
                     binding.btnCreateModule.text = "Create Module"
                     binding.etModuleName.isEnabled = true
+                    binding.etPackageName.isEnabled = true
                     binding.etDescription.isEnabled = true
                     Snackbar.make(
                         binding.root,
