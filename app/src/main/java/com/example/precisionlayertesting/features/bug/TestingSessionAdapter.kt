@@ -28,22 +28,40 @@ class TestingSessionAdapter(
         val b = holder.binding
 
         val bugCount = session.bugCount
+        val reporterName = session.userProfile?.fullName ?: "Unknown Tester"
         
-        b.tvUserName.text = session.title
-        b.tvSessionTime.text = "Workspace: ${session.workspaceId.take(8)}"
+        b.tvUserName.text = reporterName
+        b.tvSessionTime.text = formatTimeAgo(session.createdAt)
         
-        // Placeholder Avatar logic
-        val initial = session.title.take(1).uppercase()
+        // Avatar logic using initials
+        val initial = reporterName.take(1).uppercase()
         b.tvInitials.text = initial
-        b.tvInitials.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#E0E7FF"))
-        b.tvInitials.setTextColor(Color.parseColor("#4338CA"))
+        b.tvInitials.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#E8F0FE"))
+        b.tvInitials.setTextColor(Color.parseColor("#1A73E8"))
         
-        b.tvTotalBugs.text = "$bugCount Bugs Total"
-        b.tvOpenBugs.text = "Managed State"
-        b.tvResolvedBugs.text = ""
+        b.tvTotalBugs.text = if (bugCount == 1) "1 Bug Total" else "$bugCount Bugs Total"
+        b.tvOpenBugs.text = "$bugCount Active"
+        b.tvResolvedBugs.text = "0 Resolved" // Default for now
 
         b.root.setOnClickListener {
             onItemClick(session)
+        }
+    }
+
+    private fun formatTimeAgo(dateStr: String?): String {
+        if (dateStr == null) return "Unknown"
+        return try {
+            // Supabase returns timestamps like 2026-04-19T14:58:07.330846+00:00
+            val sdf = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault())
+            sdf.timeZone = java.util.TimeZone.getTimeZone("UTC")
+            val date = sdf.parse(dateStr)
+            if (date != null) {
+                android.text.format.DateUtils.getRelativeTimeSpanString(date.time, System.currentTimeMillis(), android.text.format.DateUtils.MINUTE_IN_MILLIS).toString()
+            }
+            else "Recent"
+        }
+        catch (e: Exception) {
+            "Recent"
         }
     }
 

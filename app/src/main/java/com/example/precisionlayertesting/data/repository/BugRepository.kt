@@ -194,6 +194,44 @@ class BugRepository(
         }
     }
 
+    suspend fun createTestingSession(request: TestingSessionCreateRequest): Result<TestingSession> = withContext(Dispatchers.IO) {
+        try {
+            val response = apiService.createTestingSession(request = request)
+            if (response.isSuccessful) {
+                val session = response.body()?.firstOrNull()
+                if (session != null) {
+                    Result.Success(session)
+                } else {
+                    Result.Error(Exception("No session data returned"))
+                }
+            } else {
+                val errorBody = response.errorBody()?.string() ?: "Unknown error"
+                Result.Error(Exception("Session creation failed: $errorBody"))
+            }
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+
+    suspend fun submitBugReports(reports: List<BugReportCreateRequest>): Result<List<BugReport>> = withContext(Dispatchers.IO) {
+        try {
+            val response = apiService.createBugReports(request = reports)
+            if (response.isSuccessful) {
+                val data = response.body()
+                if (data != null) {
+                    Result.Success(data)
+                } else {
+                    Result.Error(Exception("No reporting data returned"))
+                }
+            } else {
+                val errorBody = response.errorBody()?.string() ?: "Unknown error"
+                Result.Error(Exception("Bug submission failed: $errorBody"))
+            }
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+
     suspend fun confirmUpload(request: ConfirmUploadRequest): Result<AppVersion> = withContext(Dispatchers.IO) {
         try {
             val response = apiService.confirmUpload(request)

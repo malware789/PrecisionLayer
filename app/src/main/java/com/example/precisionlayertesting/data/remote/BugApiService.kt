@@ -28,7 +28,8 @@ interface BugApiService {
     suspend fun getBugGroups(
         @Query("version_id") versionId: String,
         @Query("workspace_id") workspaceId: String,
-        @Query("select") select: String = "*,bug_reports(count)"
+        @Query("select") select: String = "*,profiles(full_name,email),bug_reports(count)",
+        @Query("order") order: String = "created_at.desc"
     ): List<TestingSession>
 
     @GET("rest/v1/bug_reports")
@@ -58,6 +59,18 @@ interface BugApiService {
         @Header("Prefer") prefer: String = "return=representation",
         @Body request: AppVersionCreateRequest
     ): Response<List<AppVersion>>
+
+    @POST("rest/v1/testing_sessions")
+    suspend fun createTestingSession(
+        @Header("Prefer") prefer: String = "return=representation",
+        @Body request: TestingSessionCreateRequest
+    ): Response<List<TestingSession>>
+
+    @POST("rest/v1/bug_reports")
+    suspend fun createBugReports(
+        @Header("Prefer") prefer: String = "return=representation",
+        @Body request: List<BugReportCreateRequest>
+    ): Response<List<BugReport>>
 
     @POST("functions/v1/validate-apk")
     suspend fun validateApk(

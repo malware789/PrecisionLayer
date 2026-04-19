@@ -65,7 +65,7 @@ object RetrofitClient {
         chain.proceed(request)
     }
 
-    private val okHttpClient = OkHttpClient.Builder()
+    internal val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(authInterceptor)
         .authenticator(tokenAuthenticator)
         .connectTimeout(30, TimeUnit.SECONDS)

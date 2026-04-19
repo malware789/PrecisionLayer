@@ -79,11 +79,19 @@ data class TestingSession(
     @SerializedName("version_id") val versionId: String,
     @SerializedName("workspace_id") val workspaceId: String,
     @SerializedName("title") val title: String,
+    @SerializedName("created_at") val createdAt: String? = null,
+    @SerializedName("user_id") val userId: String? = null,
+    @SerializedName("profiles") val userProfile: UserProfile? = null,
     @SerializedName("bug_reports") val bugReports: List<BugReportCount>? = null
 ) : Parcelable {
-    val bugCount: Int
-        get() = bugReports?.firstOrNull()?.count ?: 0
+    val bugCount: Int get() = bugReports?.firstOrNull()?.count ?: 0
 }
+
+@Parcelize
+data class UserProfile(
+    @SerializedName("full_name") val fullName: String? = null,
+    @SerializedName("email") val email: String? = null
+) : Parcelable
 
 @Parcelize
 data class BugReportCount(
@@ -99,6 +107,9 @@ data class BugReport(
     @SerializedName("severity") val severity: String, // Low, Medium, High, Critical
     @SerializedName("status") val status: String,     // Open, In Progress, Closed
     @SerializedName("description") val description: String? = null,
+    @SerializedName("steps_to_repro") val stepsToRepro: String? = null,
+    @SerializedName("component") val component: String? = null,
+    @SerializedName("image_path") val imagePath: String? = null,
     @SerializedName("created_at") val createdAt: String? = null
 ) : Parcelable {
     companion object {
@@ -112,3 +123,23 @@ data class BugReport(
         const val STATUS_CLOSED = "Closed"
     }
 }
+
+data class BugReportCreateRequest(
+    @SerializedName("workspace_id") val workspaceId: String,
+    @SerializedName("session_id") val sessionId: String,
+    @SerializedName("reporter_id") val reporterId: String,
+    @SerializedName("title") val title: String,
+    @SerializedName("severity") val severity: String,
+    @SerializedName("description") val description: String,
+    @SerializedName("steps_to_repro") val stepsToRepro: String? = null,
+    @SerializedName("component") val component: String? = null,
+    @SerializedName("image_path") val imagePath: String? = null
+)
+
+data class TestingSessionCreateRequest(
+    @SerializedName("workspace_id") val workspaceId: String,
+    @SerializedName("version_id") val versionId: String,
+    @SerializedName("user_id") val userId: String,
+    @SerializedName("title") val title: String,
+    @SerializedName("status") val status: String = "Active"
+)

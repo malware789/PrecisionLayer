@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.precisionlayertesting.core.di.ManualDI
 import com.example.precisionlayertesting.core.utils.Result
 import com.example.precisionlayertesting.databinding.FragmentBugTrackingBinding
+import com.example.precisionlayertesting.features.auth.ChooseWorkspaceTypeFragmentDirections
 
 class BugTrackingFragment : Fragment() {
 
@@ -64,8 +65,13 @@ class BugTrackingFragment : Fragment() {
         binding.rvTestingSessions.adapter = adapter
 
         binding.fabAddBug.setOnClickListener {
-            // Future form logic
-            Toast.makeText(requireContext(), "Report Bug Coming Soon", Toast.LENGTH_SHORT).show()
+            val action = BugTrackingFragmentDirections.actionBugTrackingFragmentToReportBugFormFragment(
+                moduleId = args.moduleId,
+                versionId = args.versionId,
+                moduleName = args.moduleName,
+                versionName = args.versionName
+            )
+            findNavController().navigate(action)
         }
     }
 

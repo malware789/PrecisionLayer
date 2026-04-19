@@ -15,10 +15,12 @@ class AppRepository(private val apiService: ApiService) {
                 } else {
                     Result.Error(Exception("Empty body response"))
                 }
-            } else {
+            }
+            else {
                 Result.Error(Exception("Error: code ${response.code()}"))
             }
-        } catch (e: Exception) {
+        }
+        catch (e: Exception) {
             Result.Error(e)
         }
     }

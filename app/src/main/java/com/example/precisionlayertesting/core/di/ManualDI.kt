@@ -47,8 +47,22 @@ object ManualDI {
         ApkMetadataExtractor(appContext)
     }
 
+    // Separate Retrofit for BugApiService — uses serializeNulls() so all batch
+    // request objects have identical JSON keys, avoiding PostgREST PGRST102 errors.
+    private val bugGson: com.google.gson.Gson = com.google.gson.GsonBuilder()
+        .serializeNulls()
+        .create()
+
+    private val bugRetrofit: retrofit2.Retrofit by lazy {
+        retrofit2.Retrofit.Builder()
+            .baseUrl(RetrofitClient.retrofit.baseUrl())
+            .client(RetrofitClient.okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create(bugGson))
+            .build()
+    }
+
     private val bugApiService: BugApiService by lazy {
-        RetrofitClient.retrofit.create(BugApiService::class.java)
+        bugRetrofit.create(BugApiService::class.java)
     }
 
     private val r2Retrofit: retrofit2.Retrofit by lazy {

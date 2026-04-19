@@ -7,6 +7,7 @@
     android:background="@color/surface">
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fillViewport="true"
@@ -20,7 +21,35 @@
             android:paddingTop="16dp"
             android:paddingBottom="50dp">
 
-            <!-- Summary Section: Added Bugs -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp">
+                <TextView
+                    android:id="@+id/tvFormTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Bug Information"
+                    android:textColor="@color/on_surface"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/tvBugCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_badge_pill"
+                    android:backgroundTint="@color/primary_fixed_dim2"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="6dp"
+                    android:text="0 Bugs"
+                    android:textColor="@color/primary"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvAddedBugs"
                 android:layout_width="match_parent"
@@ -29,8 +58,8 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 android:layout_marginBottom="10dp"
                 android:clipToPadding="false"
+                android:visibility="visible"
                 tools:listitem="@layout/item_added_bug"
-
                 />
 
 
@@ -55,11 +84,13 @@
                 android:layout_marginBottom="5dp" />
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilBugTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 app:hintEnabled="false">
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etBugTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Briefly describe the issue..."
@@ -79,16 +110,17 @@
                 android:layout_marginBottom="5dp" />
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilComponent"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 app:hintEnabled="false">
                 <AutoCompleteTextView
+                    android:id="@+id/atvComponent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:padding="16dp"
-                    android:text="Authentication Engine"
                     android:inputType="none"
                     android:textSize="14sp" />
             </com.google.android.material.textfield.TextInputLayout>
@@ -155,11 +187,13 @@
                 android:layout_marginBottom="5dp" />
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="15dp"
                 app:hintEnabled="false">
                 <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minLines="4"
@@ -208,6 +242,7 @@
             </LinearLayout>
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAddStep"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -227,6 +262,7 @@
                 android:layout_marginBottom="5dp" />
 
             <LinearLayout
+                android:id="@+id/attachmentArea"
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:orientation="horizontal"
@@ -250,6 +286,7 @@
             </LinearLayout>
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAddAnotherBug"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -273,6 +310,7 @@
         android:background="@color/surface">
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancel"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="56dp"
@@ -288,6 +326,7 @@
             android:layout_height="wrap_content" />
 
         <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSubmitAll"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"
