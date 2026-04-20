@@ -20,6 +20,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.precisionlayertesting.R
 import com.example.precisionlayertesting.core.di.ManualDI
+import com.example.precisionlayertesting.data.models.bug.BugDraft
 import com.example.precisionlayertesting.data.models.bug.BugReport
 import com.example.precisionlayertesting.databinding.FragmentReportBugFormBinding
 import com.google.android.material.snackbar.Snackbar
@@ -125,7 +126,7 @@ class ReportBugFormFragment : Fragment() {
         }
 
         // Pre-fill attachment state in ViewModel for editing (so user can see/replace it)
-        // Note: In a real app, you might want a specialized 'loadEditState' method in VM
+        viewModel.restoreAttachmentForEdit(draft.cachedUri, draft.mimeType)
         
         binding.btnAddAnotherBug.text = "Update Bug"
         binding.tvFormTitle.text = "Edit Bug Draft"
@@ -225,11 +226,20 @@ class ReportBugFormFragment : Fragment() {
                 .setTitle("Submit Bug Reports")
                 .setMessage("You are about to submit $count bug report(s). Continue?")
                 .setPositiveButton("Submit") { _, _ ->
-                    if (currentFormValid) {
-                        addCurrentBugToDraft()
-                    }
+                    val finalBug = if (currentFormValid) {
+                        BugDraft(
+                            title = binding.etBugTitle.text.toString().trim(),
+                            component = binding.atvComponent.text.toString().trim(),
+                            severity = getSelectedSeverity(),
+                            description = binding.etDescription.text.toString().trim(),
+                            steps = getStepsString().ifBlank { null },
+                            cachedUri = viewModel.currentCachedUri.value,
+                            mimeType = viewModel.currentMimeType.value
+                        )
+                    } else null
+                    
                     val userId = ManualDI.prefsManager.getUserId() ?: ""
-                    viewModel.submitAllBugs(requireContext(), userId, args.sessionId)
+                    viewModel.submitAllBugs(requireContext(), userId, args.sessionId, finalBug)
                 }
                 .setNegativeButton("Cancel", null)
                 .show()

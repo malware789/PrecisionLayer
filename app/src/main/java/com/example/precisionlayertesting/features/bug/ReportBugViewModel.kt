@@ -52,6 +52,7 @@ class ReportBugViewModel(
 
     val currentScreenshotPath: LiveData<String?> = _currentScreenshotPath
     val currentCachedUri: LiveData<Uri?> = _currentCachedUri
+    val currentMimeType: LiveData<String?> = _currentMimeType
     val uploadError: LiveData<String?> = _uploadError
 
     private var currentUploadRequestId: String? = null
@@ -144,6 +145,11 @@ class ReportBugViewModel(
         _isCurrentAttachmentUploading.value = false
     }
 
+    fun restoreAttachmentForEdit(uri: Uri?, mimeType: String?) {
+        _currentCachedUri.value = uri
+        _currentMimeType.value = mimeType
+    }
+
     fun addBugToDraft(
         title: String,
         component: String,
@@ -203,16 +209,33 @@ class ReportBugViewModel(
         }
     }
 
-    fun submitAllBugs(context: android.content.Context, userId: String, sessionId: String? = null) {
+    /**
+     * Orchestrates the full batch submission flow.
+     * 1. Console all bugs (drafts + currently filled one)
+     * 2. Batch prepare R2 upload URLs
+     * 3. Parallel streaming uploads
+     * 4. Batch insert bug reports
+     */
+    fun submitAllBugs(
+        context: android.content.Context, 
+        userId: String, 
+        sessionId: String?,
+        finalBugToAdd: BugDraft? = null
+    ) {
         if (isSubmitting) return
-        
-        val bugs = draftBugs.value.orEmpty().toMutableList()
-        if (bugs.isEmpty()) return
-
         isSubmitting = true
+
         viewModelScope.launch {
             try {
                 _submissionState.value = SubmissionState.Submitting
+                
+                // Consolidate list immediately to avoid LiveData race conditions
+                val bugs = draftBugs.value.orEmpty().toMutableList()
+                finalBugToAdd?.let { bugs.add(it) }
+                
+                if (bugs.isEmpty()) {
+                    throw Exception("No bugs to submit")
+                }
 
                 // 1. Determine Session
                 val finalSessionId = if (sessionId != null) {

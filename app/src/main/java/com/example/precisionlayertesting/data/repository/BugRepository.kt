@@ -131,8 +131,23 @@ class BugRepository(
         onProgress: (Long, Long) -> Unit
     ): Result<Unit> = withContext(Dispatchers.IO) {
         try {
-            val totalBytes = context.contentResolver.openAssetFileDescriptor(uri, "r")?.use { it.length } ?: -1L
-            
+            // Robustly determine total bytes for either file:// or content:// URIs
+            val totalBytes = try {
+                if (uri.scheme == "file") {
+                    val file = File(uri.path ?: "")
+                    if (!file.exists()) {
+                        Log.e("BugRepository", "File does not exist: ${file.absolutePath}")
+                        throw java.io.FileNotFoundException("File does not exist: ${file.absolutePath}")
+                    }
+                    file.length()
+                } else {
+                    context.contentResolver.openAssetFileDescriptor(uri, "r")?.use { it.length } ?: -1L
+                }
+            } catch (e: Exception) {
+                Log.e("BugRepository", "Failed to get length for URI: $uri", e)
+                -1L
+            }
+
             val mediaType = MediaType.parse(mimeType)
             val requestBody = StreamingProgressRequestBody(
                 context = context,
