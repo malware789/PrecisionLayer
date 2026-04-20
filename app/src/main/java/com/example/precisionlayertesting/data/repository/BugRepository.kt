@@ -31,17 +31,17 @@ class BugRepository(
 
     // ... existing get/create methods ...
 
-    suspend fun prepareScreenshotUpload(request: ScreenshotUploadRequest): Result<ScreenshotUploadResponse> = withContext(Dispatchers.IO) {
+    suspend fun prepareScreenshotUploadBatch(request: ScreenshotBatchPrepareRequest): Result<ScreenshotBatchPrepareResponse> = withContext(Dispatchers.IO) {
         try {
-            val response = apiService.prepareScreenshotUpload(request)
+            val response = apiService.prepareScreenshotUploadBatch(request)
             if (response.isSuccessful && response.body() != null) {
                 Result.Success(response.body()!!)
             } else {
-                val errorBody = response.errorBody()?.string() ?: "Preparation failed"
+                val errorBody = response.errorBody()?.string() ?: "Batch preparation failed"
                 Result.Error(Exception(errorBody))
             }
         } catch (e: Exception) {
-            Log.e(TAG, "prepareScreenshotUpload exception: ${e.message}", e)
+            Log.e(TAG, "prepareScreenshotUploadBatch exception: ${e.message}", e)
             Result.Error(e)
         }
     }
@@ -102,43 +102,61 @@ class BugRepository(
         mimeType: String,
         onProgress: (Long, Long) -> Unit
     ): Result<Unit> = withContext(Dispatchers.IO) {
-        var lastError: Exception? = null
-        val maxRetries = 1
-        
-        for (attempt in 0..maxRetries) {
-            try {
-                if (attempt > 0) Log.d(TAG, "Retrying upload... Attempt $attempt")
-                
-                val mediaType = MediaType.parse(mimeType)
-                val requestBody = ProgressRequestBody(mediaType, data, onProgress)
-                
-                val response = r2ApiService.uploadFile(
-                    uploadUrl = url, 
-                    contentType = mimeType, 
-                    file = requestBody
-                )
-                
-                if (response.isSuccessful) {
-                    Log.d(TAG, "R2 Upload successful")
-                    return@withContext Result.Success(Unit)
-                } else {
-                    val errorCode = response.code()
-                    val errorMsg = response.message()
-                    val errorBody = response.errorBody()?.string() ?: "No error body"
-                    Log.e(TAG, "R2 Upload failed - Code: $errorCode, Msg: $errorMsg, Body: $errorBody")
-                    lastError = Exception("Upload failed ($errorCode): $errorMsg")
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Upload attempt $attempt failed: ${e.message}", e)
-                lastError = e
-            }
+        try {
+            val mediaType = MediaType.parse(mimeType)
+            val requestBody = ProgressRequestBody(mediaType, data, onProgress)
             
-            if (attempt < maxRetries) {
-                kotlinx.coroutines.delay(1000L * (attempt + 1))
+            val response = r2ApiService.uploadFile(
+                uploadUrl = url, 
+                contentType = mimeType, 
+                file = requestBody
+            )
+            
+            if (response.isSuccessful) {
+                Result.Success(Unit)
+            } else {
+                val errorBody = response.errorBody()?.string() ?: "Upload failed"
+                Result.Error(Exception(errorBody))
             }
+        } catch (e: Exception) {
+            Result.Error(e)
         }
-        
-        Result.Error(lastError ?: Exception("Unknown upload error"))
+    }
+
+    suspend fun uploadToR2Stream(
+        url: String,
+        context: Context,
+        uri: Uri,
+        mimeType: String,
+        onProgress: (Long, Long) -> Unit
+    ): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val totalBytes = context.contentResolver.openAssetFileDescriptor(uri, "r")?.use { it.length } ?: -1L
+            
+            val mediaType = MediaType.parse(mimeType)
+            val requestBody = StreamingProgressRequestBody(
+                context = context,
+                uri = uri,
+                contentType = mediaType,
+                totalBytes = totalBytes,
+                onProgress = onProgress
+            )
+            
+            val response = r2ApiService.uploadFile(
+                uploadUrl = url,
+                contentType = mimeType,
+                file = requestBody
+            )
+
+            if (response.isSuccessful) {
+                Result.Success(Unit)
+            } else {
+                val errorBody = response.errorBody()?.string() ?: "Streaming upload failed"
+                Result.Error(Exception(errorBody))
+            }
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
     }
 
     // ... existing createTestingSession, submitBugReports, confirmUpload methods ...
@@ -305,7 +323,7 @@ class BugRepository(
         override fun writeTo(sink: okio.BufferedSink) {
             val total = contentLength()
             var uploaded = 0L
-            val bufferSize = 2048
+            val bufferSize = 8192
             var offset = 0
             
             while (offset < data.size) {
@@ -315,6 +333,31 @@ class BugRepository(
                 uploaded += toRead
                 onProgress(uploaded, total)
             }
+        }
+    }
+
+    private class StreamingProgressRequestBody(
+        private val context: Context,
+        private val uri: Uri,
+        private val contentType: MediaType?,
+        private val totalBytes: Long,
+        private val onProgress: (Long, Long) -> Unit
+    ) : RequestBody() {
+        override fun contentType(): MediaType? = contentType
+        override fun contentLength(): Long = totalBytes
+
+        override fun writeTo(sink: okio.BufferedSink) {
+            val buffer = ByteArray(8192)
+            var bytesRead: Int
+            var uploaded = 0L
+            
+            context.contentResolver.openInputStream(uri)?.use { input ->
+                while (input.read(buffer).also { bytesRead = it } != -1) {
+                    sink.write(buffer, 0, bytesRead)
+                    uploaded += bytesRead
+                    onProgress(uploaded, totalBytes)
+                }
+            } ?: throw java.io.IOException("Failed to open input stream for URI: $uri")
         }
     }
 

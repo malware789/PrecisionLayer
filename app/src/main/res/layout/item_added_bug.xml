@@ -33,7 +33,7 @@
                 android:textColor="@color/on_surface"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                android:maxLines="2"
+                android:maxLines="1"
                 android:ellipsize="end" />
 
             <TextView
@@ -62,7 +62,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Authentication Engine"
+                android:text="Authentication Engine estryuio"
+                android:ellipsize="end"
+                android:maxLines="2"
                 android:textColor="@color/on_surface_variant"
                 android:textSize="12sp" />
 
@@ -83,5 +85,6 @@
                 app:tint="#EB5757"
                 tools:ignore="ContentDescription" />
         </LinearLayout>
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

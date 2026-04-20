@@ -162,8 +162,30 @@ data class DeleteFileRequest(
     @SerializedName("file_path") val filePath: String
 )
 
+data class ScreenshotBatchPrepareRequest(
+    @SerializedName("workspace_id") val workspaceId: String,
+    @SerializedName("files") val files: List<FileRequest>
+)
+
+data class FileRequest(
+    @SerializedName("draft_id") val draftId: String,
+    @SerializedName("extension") val extension: String,
+    @SerializedName("mime_type") val mimeType: String
+)
+
+data class ScreenshotBatchPrepareResponse(
+    @SerializedName("uploads") val uploads: List<UploadInfo>
+)
+
+data class UploadInfo(
+    @SerializedName("draft_id") val draftId: String,
+    @SerializedName("upload_url") val uploadUrl: String,
+    @SerializedName("file_path") val filePath: String
+)
+
 @Parcelize
 data class BugDraft(
+    val id: String = java.util.UUID.randomUUID().toString(),
     val title: String,
     val component: String,
     val severity: String,

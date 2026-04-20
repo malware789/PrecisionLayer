@@ -275,7 +275,9 @@ class ReportBugFormFragment : Fragment() {
             // Update counter
             binding.tvBugCount.text = "${drafts.size} Bug${if (drafts.size == 1) "" else "s"}"
             binding.tvBugCount.visibility = if (drafts.isEmpty()) View.GONE else View.VISIBLE
-            viewModel.isCurrentAttachmentUploading.observe(viewLifecycleOwner) { isUploading ->
+        }
+
+        viewModel.isCurrentAttachmentUploading.observe(viewLifecycleOwner) { isUploading ->
             binding.btnAddAnotherBug.isEnabled = !isUploading
             binding.attachmentArea.alpha = if (isUploading) 0.5f else 1.0f
             binding.pbAttachmentUpload.visibility = if (isUploading) View.VISIBLE else View.GONE
@@ -283,8 +285,7 @@ class ReportBugFormFragment : Fragment() {
             if (isUploading) {
                 binding.btnAddAnotherBug.text = "Processing Image..."
                 binding.attachmentPlaceholder.isClickable = false
-            }
-            else {
+            } else {
                 binding.btnAddAnotherBug.text = if (editingDraftIndex != null) "Update Bug" else "Add Another Bug"
                 binding.attachmentPlaceholder.isClickable = true
             }
@@ -293,19 +294,15 @@ class ReportBugFormFragment : Fragment() {
         viewModel.submissionState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is ReportBugViewModel.SubmissionState.Submitting -> {
-                    binding.btnSubmitAll.isEnabled = false
-                    binding.btnSubmitAll.text = "Submitting..."
-                    // Lock other actions
-                    binding.btnAddAnotherBug.isEnabled = false
+                    setLoading(true)
                 }
                 is ReportBugViewModel.SubmissionState.Success -> {
-                    Snackbar.make(binding.root, "✓ All bugs submitted successfully", Snackbar.LENGTH_LONG).show()
+                    setLoading(false)
+                    Toast.makeText(requireContext(), "✓ All bugs submitted successfully!", Toast.LENGTH_LONG).show()
                     findNavController().popBackStack()
                 }
                 is ReportBugViewModel.SubmissionState.Error -> {
-                    binding.btnSubmitAll.isEnabled = true
-                    binding.btnSubmitAll.text = "Submit All Bugs"
-                    binding.btnAddAnotherBug.isEnabled = true
+                    setLoading(false)
                     com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
                         .setTitle("Submission Failed")
                         .setMessage(state.message)
@@ -313,7 +310,7 @@ class ReportBugFormFragment : Fragment() {
                         .show()
                 }
                 else -> {
-                    // Idle state - reset if needed
+                    setLoading(false)
                 }
             }
         }
@@ -331,7 +328,6 @@ class ReportBugFormFragment : Fragment() {
                 binding.btnSubmitAll.text = "Submit All Bugs"
             }
         }
-  }
 
         binding.ivDeleteScreenshot.setOnClickListener {
             viewModel.removeCurrentScreenshot()
@@ -358,23 +354,6 @@ class ReportBugFormFragment : Fragment() {
             }
         }
 
-        viewModel.submissionState.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                is ReportBugViewModel.SubmissionState.Submitting -> setLoading(true)
-                is ReportBugViewModel.SubmissionState.Success -> {
-                    setLoading(false)
-                    Toast.makeText(requireContext(), "✓ All bugs submitted!", Toast.LENGTH_LONG).show()
-                    findNavController().popBackStack()
-                }
-                is ReportBugViewModel.SubmissionState.Error -> {
-                    setLoading(false)
-                    Snackbar.make(binding.root, "Error: ${state.message}", Snackbar.LENGTH_LONG)
-                        .setBackgroundTint(resources.getColor(android.R.color.holo_red_dark, null))
-                        .show()
-                }
-                else -> setLoading(false)
-            }
-        }
     }
 
     private fun validateForm(showErrors: Boolean = true): Boolean {

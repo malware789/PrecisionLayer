@@ -2,6 +2,7 @@ package com.example.precisionlayertesting.features.bug
 
 import android.net.Uri
 import android.os.Parcelable
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -11,6 +12,10 @@ import com.example.precisionlayertesting.core.utils.Result
 import com.example.precisionlayertesting.data.models.bug.*
 import com.example.precisionlayertesting.data.repository.BugRepository
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.parcelize.Parcelize
 import java.util.UUID
 import java.io.File
@@ -173,15 +178,15 @@ class ReportBugViewModel(
     ) {
         val currentList = draftBugs.value.orEmpty().toMutableList()
         if (index in currentList.indices) {
-            currentList[index] = BugDraft(
+            val oldDraft = currentList[index]
+            currentList[index] = oldDraft.copy(
                 title = title,
                 component = component,
                 severity = severity,
                 description = description,
                 steps = steps,
-                cachedUri = _currentCachedUri.value,
-                imagePath = null, // Will be populated during final submit
-                mimeType = _currentMimeType.value
+                cachedUri = _currentCachedUri.value ?: oldDraft.cachedUri,
+                mimeType = _currentMimeType.value ?: oldDraft.mimeType
             )
             savedStateHandle[KEY_DRAFTS] = currentList
             clearAttachment()
@@ -227,31 +232,62 @@ class ReportBugViewModel(
                     }
                 }
 
-                // 2. Sequential Image Uploads
-                for (i in bugs.indices) {
-                    val draft = bugs[i]
-                    if (draft.cachedUri != null && draft.imagePath == null) {
-                        val ext = draft.mimeType?.substringAfter("/") ?: "jpeg"
-                        
-                        // Prepare
-                        val prepResult = repository.prepareScreenshotUpload(
-                            ScreenshotUploadRequest(workspaceId, ext, draft.mimeType ?: "image/jpeg")
-                        )
-                        if (prepResult !is Result.Success) throw Exception("Failed to prepare storage for bug #${i + 1}")
-                        
-                        val uploadUrl = (prepResult as Result.Success).data.uploadUrl
-                        val remotePath = prepResult.data.filePath
+                // 2. Parallel Optimized Uploads
+                val draftsToUpload = bugs.filter { it.cachedUri != null && it.imagePath == null }
+                if (draftsToUpload.isNotEmpty()) {
+                    // 2a. Batch Prepare Signed URLs
+                    val batchRequest = ScreenshotBatchPrepareRequest(
+                        workspaceId = workspaceId,
+                        files = draftsToUpload.map { d ->
+                            FileRequest(
+                                draftId = d.id,
+                                extension = d.mimeType?.substringAfter("/") ?: "jpeg",
+                                mimeType = d.mimeType ?: "image/jpeg"
+                            )
+                        }
+                    )
+                    
+                    val prepResult = repository.prepareScreenshotUploadBatch(batchRequest)
+                    if (prepResult !is Result.Success) throw Exception("Failed to prepare storage URLs")
+                    
+                    val uploadInfos = prepResult.data.uploads
+                    val infoMap = uploadInfos.associateBy { it.draftId }
 
-                        // Upload bytes
-                        val bytes = context.contentResolver.openInputStream(draft.cachedUri)?.readBytes() 
-                            ?: throw Exception("Failed to read cached image for bug #${i + 1}")
-                            
-                        val uploadResult = repository.uploadToR2(uploadUrl, bytes, draft.mimeType ?: "image/jpeg") { _, _ -> }
-                        if (uploadResult !is Result.Success) throw Exception("Upload failed for bug #${i + 1}")
-
-                        // Update list with remote path
-                        bugs[i] = draft.copy(imagePath = remotePath)
+                    // 2b. Parallel Streaming Uploads (Concurrency limit: 3)
+                    val semaphore = Semaphore(3)
+                    val uploadTasks = draftsToUpload.map { draft ->
+                        async {
+                            semaphore.withPermit {
+                                val info = infoMap[draft.id] ?: throw Exception("Missing upload info for bug")
+                                
+                                val uploadResult = repository.uploadToR2Stream(
+                                    url = info.uploadUrl,
+                                    context = context,
+                                    uri = draft.cachedUri!!,
+                                    mimeType = draft.mimeType ?: "image/jpeg",
+                                    onProgress = { _, _ -> }
+                                )
+                                
+                                if (uploadResult is Result.Success) {
+                                    info.filePath
+                                } else {
+                                    throw (uploadResult as Result.Error).exception
+                                }
+                            }
+                        }
                     }
+
+                    val remotePaths = uploadTasks.awaitAll()
+                    
+                    // 2c. Update local list with remote paths
+                    draftsToUpload.forEachIndexed { index, draft ->
+                        val listIndex = bugs.indexOfFirst { it.id == draft.id }
+                        if (listIndex != -1) {
+                            bugs[listIndex] = draft.copy(imagePath = remotePaths[index])
+                        }
+                    }
+                    // Sync with SavedState
+                    savedStateHandle[KEY_DRAFTS] = bugs.toList()
                 }
 
                 // 3. Final Batch Submission
@@ -275,15 +311,19 @@ class ReportBugViewModel(
                     bugs.forEach { draft -> 
                         draft.cachedUri?.path?.let { path -> File(path).delete() }
                     }
+
                     _submissionState.value = SubmissionState.Success
                     savedStateHandle[KEY_DRAFTS] = emptyList<BugDraft>()
-                } else {
+                }
+                else {
                     throw Exception("Batch report insertion failed")
                 }
 
             } catch (e: Exception) {
+                Log.e("ReportBugViewModel", "Submission error", e)
                 _submissionState.value = SubmissionState.Error(e.message ?: "Submission failed")
-            } finally {
+            }
+            finally {
                 isSubmitting = false
             }
         }

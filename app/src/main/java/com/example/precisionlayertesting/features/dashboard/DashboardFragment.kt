@@ -74,9 +74,6 @@ class DashboardFragment : Fragment() {
                 }
                 is Result.Success -> {
                     adapter.updateData(result.data)
-                    if (result.data.isEmpty()) {
-                        Toast.makeText(requireContext(), "No modules yet. Tap + to create one.", Toast.LENGTH_SHORT).show()
-                    }
                 }
                 is Result.Error -> {
                     Toast.makeText(requireContext(), "Error: ${result.exception.message}", Toast.LENGTH_LONG).show()

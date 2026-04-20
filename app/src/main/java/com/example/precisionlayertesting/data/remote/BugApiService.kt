@@ -87,6 +87,11 @@ interface BugApiService {
         @Body request: ScreenshotUploadRequest
     ): Response<ScreenshotUploadResponse>
 
+    @POST("functions/v1/prepare-bug-screenshot-upload-batch")
+    suspend fun prepareScreenshotUploadBatch(
+        @Body request: ScreenshotBatchPrepareRequest
+    ): Response<ScreenshotBatchPrepareResponse>
+
     @POST("functions/v1/delete-r2-file")
     suspend fun deleteR2File(
         @Body request: DeleteFileRequest
