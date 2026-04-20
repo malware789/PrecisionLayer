@@ -9,6 +9,14 @@ import kotlinx.coroutines.withContext
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import com.example.precisionlayertesting.data.remote.R2ApiService
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.util.UUID
 
 class BugRepository(
     private val apiService: BugApiService,
@@ -17,7 +25,123 @@ class BugRepository(
 
     companion object {
         private const val TAG = "BugRepository"
+        private const val MAX_IMAGE_SIZE = 2 * 1024 * 1024 // 2MB
+        private const val COMPRESSION_QUALITY = 80
     }
+
+    // ... existing get/create methods ...
+
+    suspend fun prepareScreenshotUpload(request: ScreenshotUploadRequest): Result<ScreenshotUploadResponse> = withContext(Dispatchers.IO) {
+        try {
+            val response = apiService.prepareScreenshotUpload(request)
+            if (response.isSuccessful && response.body() != null) {
+                Result.Success(response.body()!!)
+            } else {
+                val errorBody = response.errorBody()?.string() ?: "Preparation failed"
+                Result.Error(Exception(errorBody))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "prepareScreenshotUpload exception: ${e.message}", e)
+            Result.Error(e)
+        }
+    }
+
+    suspend fun deleteScreenshot(workspaceId: String, filePath: String): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val response = apiService.deleteR2File(DeleteFileRequest(workspaceId, filePath))
+            if (response.isSuccessful) {
+                Result.Success(Unit)
+            } else {
+                val errorBody = response.errorBody()?.string() ?: "Deletion failed"
+                Result.Error(Exception(errorBody))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "deleteScreenshot exception: ${e.message}", e)
+            Result.Error(e)
+        }
+    }
+
+    /**
+     * Copies URI to cache, compresses it, and returns the cached file Uri.
+     */
+    suspend fun cacheAndCompressImage(context: Context, sourceUri: Uri): Result<Pair<Uri, String>> = withContext(Dispatchers.IO) {
+        try {
+            val cacheDir = File(context.cacheDir, "bug_drafts").apply { if (!exists()) mkdirs() }
+            
+            val inputStream = context.contentResolver.openInputStream(sourceUri) ?: throw Exception("Failed to open input stream")
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+            inputStream.close()
+
+            if (bitmap == null) throw Exception("Failed to decode bitmap")
+
+            // Prefer JPEG for screenshots
+            val outStream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, COMPRESSION_QUALITY, outStream)
+            var byteArray = outStream.toByteArray()
+
+            // Optional: Downscale if still too large
+            if (byteArray.size > MAX_IMAGE_SIZE) {
+                // Scaling logic could go here if needed, but quality 80 is usually enough for 2MB
+                Log.w(TAG, "Image still large after compression: ${byteArray.size} bytes")
+            }
+
+            val fileName = "screenshot_${UUID.randomUUID()}.jpg"
+            val cachedFile = File(cacheDir, fileName)
+            FileOutputStream(cachedFile).use { it.write(byteArray) }
+
+            Result.Success(Pair(Uri.fromFile(cachedFile), "image/jpeg"))
+        } catch (e: Exception) {
+            Log.e(TAG, "cacheAndCompressImage exception: ${e.message}", e)
+            Result.Error(e)
+        }
+    }
+
+    suspend fun uploadToR2(
+        url: String, 
+        data: ByteArray, 
+        mimeType: String,
+        onProgress: (Long, Long) -> Unit
+    ): Result<Unit> = withContext(Dispatchers.IO) {
+        var lastError: Exception? = null
+        val maxRetries = 1
+        
+        for (attempt in 0..maxRetries) {
+            try {
+                if (attempt > 0) Log.d(TAG, "Retrying upload... Attempt $attempt")
+                
+                val mediaType = MediaType.parse(mimeType)
+                val requestBody = ProgressRequestBody(mediaType, data, onProgress)
+                
+                val response = r2ApiService.uploadFile(
+                    uploadUrl = url, 
+                    contentType = mimeType, 
+                    file = requestBody
+                )
+                
+                if (response.isSuccessful) {
+                    Log.d(TAG, "R2 Upload successful")
+                    return@withContext Result.Success(Unit)
+                } else {
+                    val errorCode = response.code()
+                    val errorMsg = response.message()
+                    val errorBody = response.errorBody()?.string() ?: "No error body"
+                    Log.e(TAG, "R2 Upload failed - Code: $errorCode, Msg: $errorMsg, Body: $errorBody")
+                    lastError = Exception("Upload failed ($errorCode): $errorMsg")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Upload attempt $attempt failed: ${e.message}", e)
+                lastError = e
+            }
+            
+            if (attempt < maxRetries) {
+                kotlinx.coroutines.delay(1000L * (attempt + 1))
+            }
+        }
+        
+        Result.Error(lastError ?: Exception("Unknown upload error"))
+    }
+
+    // ... existing createTestingSession, submitBugReports, confirmUpload methods ...
 
     suspend fun getModules(workspaceId: String): List<Module> = withContext(Dispatchers.IO) {
         apiService.getModules("eq.$workspaceId")

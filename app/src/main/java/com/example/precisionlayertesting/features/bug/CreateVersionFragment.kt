@@ -111,7 +111,8 @@ class CreateVersionFragment : Fragment() {
                 binding.tvPreviewVersionName.text = metadata.versionName
                 binding.tvPreviewVersionCode.text = metadata.versionCode.toString()
                 binding.tvApkDetails.text = "Metadata extraction successful"
-            } else {
+            }
+            else {
                 binding.layoutPreview.visibility = View.GONE
             }
             updateButtonState()

@@ -143,3 +143,36 @@ data class TestingSessionCreateRequest(
     @SerializedName("title") val title: String,
     @SerializedName("status") val status: String = "Active"
 )
+
+// --- Bug Screenshot Upload Models ---
+
+data class ScreenshotUploadRequest(
+    @SerializedName("workspace_id") val workspaceId: String,
+    @SerializedName("extension") val extension: String,
+    @SerializedName("mime_type") val mimeType: String? = null
+)
+
+data class ScreenshotUploadResponse(
+    @SerializedName("upload_url") val uploadUrl: String,
+    @SerializedName("file_path") val filePath: String
+)
+
+data class DeleteFileRequest(
+    @SerializedName("workspace_id") val workspaceId: String,
+    @SerializedName("file_path") val filePath: String
+)
+
+@Parcelize
+data class BugDraft(
+    val title: String,
+    val component: String,
+    val severity: String,
+    val description: String,
+    val steps: String?,
+    val cachedUri: android.net.Uri? = null,
+    val imagePath: String? = null,
+    val mimeType: String? = null,
+    val isUploading: Boolean = false,
+    val uploadRequestId: String? = null,
+    val uploadError: String? = null
+) : Parcelable

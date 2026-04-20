@@ -5,18 +5,19 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.precisionlayertesting.data.models.bug.BugDraft
 import com.example.precisionlayertesting.databinding.ItemAddedBugBinding
 
-class AddedBugsAdapter : ListAdapter<ReportBugViewModel.BugDraft, AddedBugsAdapter.ViewHolder>(DIFF) {
+class AddedBugsAdapter : ListAdapter<BugDraft, AddedBugsAdapter.ViewHolder>(DIFF) {
 
     var onDeleteItem: ((Int) -> Unit)? = null
     var onEditItem: ((Int) -> Unit)? = null
 
     companion object {
-        private val DIFF = object : DiffUtil.ItemCallback<ReportBugViewModel.BugDraft>() {
-            override fun areItemsTheSame(a: ReportBugViewModel.BugDraft, b: ReportBugViewModel.BugDraft) = 
+        private val DIFF = object : DiffUtil.ItemCallback<BugDraft>() {
+            override fun areItemsTheSame(a: BugDraft, b: BugDraft) = 
                 a.title == b.title && a.description == b.description
-            override fun areContentsTheSame(a: ReportBugViewModel.BugDraft, b: ReportBugViewModel.BugDraft) = 
+            override fun areContentsTheSame(a: BugDraft, b: BugDraft) = 
                 a == b
         }
     }
@@ -25,7 +26,7 @@ class AddedBugsAdapter : ListAdapter<ReportBugViewModel.BugDraft, AddedBugsAdapt
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(
-            draft: ReportBugViewModel.BugDraft, 
+            draft: BugDraft, 
             position: Int, 
             onDelete: (Int) -> Unit,
             onEdit: (Int) -> Unit

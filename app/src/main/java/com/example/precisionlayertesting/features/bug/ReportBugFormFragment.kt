@@ -59,7 +59,7 @@ class ReportBugFormFragment : Fragment() {
     private val addedBugsAdapter = AddedBugsAdapter()
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let { selectedScreenshotUri = it }
+        uri?.let { viewModel.onScreenshotSelected(requireContext(), it) }
     }
 
     override fun onCreateView(
@@ -124,7 +124,8 @@ class ReportBugFormFragment : Fragment() {
             }
         }
 
-        selectedScreenshotUri = draft.screenshotUri
+        // Pre-fill attachment state in ViewModel for editing (so user can see/replace it)
+        // Note: In a real app, you might want a specialized 'loadEditState' method in VM
         
         binding.btnAddAnotherBug.text = "Update Bug"
         binding.tvFormTitle.text = "Edit Bug Draft"
@@ -141,6 +142,7 @@ class ReportBugFormFragment : Fragment() {
     private fun cancelEdit() {
         editingDraftIndex = null
         resetForm()
+        viewModel.clearAttachment()
         binding.btnAddAnotherBug.text = "Add Another Bug"
         binding.tvFormTitle.text = "Bug Information"
     }
@@ -176,7 +178,7 @@ class ReportBugFormFragment : Fragment() {
         }
 
         // --- Attachment area ---
-        binding.attachmentArea.setOnClickListener {
+        binding.attachmentPlaceholder.setOnClickListener {
             pickImageLauncher.launch("image/*")
         }
 
@@ -193,8 +195,7 @@ class ReportBugFormFragment : Fragment() {
                         component = binding.atvComponent.text.toString().trim(),
                         severity = priority,
                         description = binding.etDescription.text.toString().trim(),
-                        steps = stepsText.ifBlank { null },
-                        screenshotUri = selectedScreenshotUri
+                        steps = stepsText.ifBlank { null }
                     )
                     cancelEdit()
                     Snackbar.make(binding.root, "✓ Draft updated", Snackbar.LENGTH_SHORT).show()
@@ -228,7 +229,7 @@ class ReportBugFormFragment : Fragment() {
                         addCurrentBugToDraft()
                     }
                     val userId = ManualDI.prefsManager.getUserId() ?: ""
-                    viewModel.submitAllBugs(userId, args.sessionId)
+                    viewModel.submitAllBugs(requireContext(), userId, args.sessionId)
                 }
                 .setNegativeButton("Cancel", null)
                 .show()
@@ -239,7 +240,7 @@ class ReportBugFormFragment : Fragment() {
             if (editingDraftIndex != null) {
                 cancelEdit()
             } else if (viewModel.draftBugs.value?.isNotEmpty() == true) {
-                 com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                  com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
                     .setTitle("Discard Session?")
                     .setMessage("You have unsaved drafts. Are you sure you want to leave?")
                     .setPositiveButton("Discard & Exit") { _, _ -> findNavController().popBackStack() }
@@ -274,6 +275,87 @@ class ReportBugFormFragment : Fragment() {
             // Update counter
             binding.tvBugCount.text = "${drafts.size} Bug${if (drafts.size == 1) "" else "s"}"
             binding.tvBugCount.visibility = if (drafts.isEmpty()) View.GONE else View.VISIBLE
+            viewModel.isCurrentAttachmentUploading.observe(viewLifecycleOwner) { isUploading ->
+            binding.btnAddAnotherBug.isEnabled = !isUploading
+            binding.attachmentArea.alpha = if (isUploading) 0.5f else 1.0f
+            binding.pbAttachmentUpload.visibility = if (isUploading) View.VISIBLE else View.GONE
+            
+            if (isUploading) {
+                binding.btnAddAnotherBug.text = "Processing Image..."
+                binding.attachmentPlaceholder.isClickable = false
+            }
+            else {
+                binding.btnAddAnotherBug.text = if (editingDraftIndex != null) "Update Bug" else "Add Another Bug"
+                binding.attachmentPlaceholder.isClickable = true
+            }
+        }
+
+        viewModel.submissionState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is ReportBugViewModel.SubmissionState.Submitting -> {
+                    binding.btnSubmitAll.isEnabled = false
+                    binding.btnSubmitAll.text = "Submitting..."
+                    // Lock other actions
+                    binding.btnAddAnotherBug.isEnabled = false
+                }
+                is ReportBugViewModel.SubmissionState.Success -> {
+                    Snackbar.make(binding.root, "✓ All bugs submitted successfully", Snackbar.LENGTH_LONG).show()
+                    findNavController().popBackStack()
+                }
+                is ReportBugViewModel.SubmissionState.Error -> {
+                    binding.btnSubmitAll.isEnabled = true
+                    binding.btnSubmitAll.text = "Submit All Bugs"
+                    binding.btnAddAnotherBug.isEnabled = true
+                    com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                        .setTitle("Submission Failed")
+                        .setMessage(state.message)
+                        .setPositiveButton("Retry", null)
+                        .show()
+                }
+                else -> {
+                    // Idle state - reset if needed
+                }
+            }
+        }
+
+        viewModel.isAnyUploadInProgress.observe(viewLifecycleOwner) { isAnyLoading ->
+            // Prevent global submission if any bug (current or draft) is still processing
+            binding.btnSubmitAll.isEnabled = !isAnyLoading
+            if (isAnyLoading) {
+                binding.btnSubmitAll.alpha = 0.5f
+                if (viewModel.submissionState.value is ReportBugViewModel.SubmissionState.Submitting) {
+                    binding.btnSubmitAll.text = "Uploading Evidence..."
+                }
+            } else {
+                binding.btnSubmitAll.alpha = 1.0f
+                binding.btnSubmitAll.text = "Submit All Bugs"
+            }
+        }
+  }
+
+        binding.ivDeleteScreenshot.setOnClickListener {
+            viewModel.removeCurrentScreenshot()
+        }
+
+        viewModel.currentCachedUri.observe(viewLifecycleOwner) { uri ->
+             if (uri != null) {
+                binding.ivScreenshotPreview.setImageURI(uri)
+                binding.attachmentPlaceholder.visibility = View.GONE
+                binding.ivScreenshotPreview.visibility = View.VISIBLE
+                binding.ivDeleteScreenshot.visibility = View.VISIBLE
+            }
+             else {
+                binding.ivScreenshotPreview.setImageDrawable(null)
+                binding.attachmentPlaceholder.visibility = View.VISIBLE
+                binding.ivScreenshotPreview.visibility = View.GONE
+                binding.ivDeleteScreenshot.visibility = View.GONE
+            }
+        }
+
+        viewModel.uploadError.observe(viewLifecycleOwner) { error ->
+            if (error != null) {
+                Snackbar.make(binding.root, "Attachment Error: $error", Snackbar.LENGTH_LONG).show()
+            }
         }
 
         viewModel.submissionState.observe(viewLifecycleOwner) { state ->
@@ -345,8 +427,7 @@ class ReportBugFormFragment : Fragment() {
             component = binding.atvComponent.text.toString().trim(),
             severity = getSelectedSeverity(),
             description = binding.etDescription.text.toString().trim(),
-            steps = getStepsString().ifBlank { null },
-            screenshotUri = selectedScreenshotUri
+            steps = getStepsString().ifBlank { null }
         )
     }
 
@@ -365,7 +446,9 @@ class ReportBugFormFragment : Fragment() {
         // Reset priority to HIGH
         binding.togglePriority.check(R.id.btnHigh)
 
-        selectedScreenshotUri = null
+        binding.ivScreenshotPreview.setImageDrawable(null)
+        binding.attachmentPlaceholder.visibility = View.VISIBLE
+        binding.ivScreenshotPreview.visibility = View.GONE
 
         binding.tilBugTitle.error = null
         binding.tilComponent.error = null
@@ -376,7 +459,7 @@ class ReportBugFormFragment : Fragment() {
         binding.btnSubmitAll.isEnabled = !loading
         binding.btnAddAnotherBug.isEnabled = !loading
         binding.btnCancel.isEnabled = !loading
-        binding.btnSubmitAll.text = if (loading) "Submitting..." else "Submit Bugs"
+        binding.btnSubmitAll.text = if (loading) "Submitting..." else "Submit All Bugs"
     }
 
     override fun onDestroyView() {
