@@ -13,8 +13,8 @@ import com.example.precisionlayertesting.R
 import com.example.precisionlayertesting.MainActivity
 import com.example.precisionlayertesting.core.di.ManualDI
 import com.example.precisionlayertesting.core.utils.Result
-import com.example.precisionlayertesting.data.models.auth.LoginRequest
-import com.example.precisionlayertesting.data.models.auth.User
+import com.example.precisionlayertesting.core.models.auth.LoginRequest
+import com.example.precisionlayertesting.core.models.auth.User
 import com.example.precisionlayertesting.databinding.FragmentLoginBinding
 
 class LoginFragment : Fragment() {

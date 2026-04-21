@@ -1,4 +1,4 @@
-package com.example.precisionlayertesting.data.models.auth
+package com.example.precisionlayertesting.core.models.auth
 
 data class LoginRequest(
     val email: String,

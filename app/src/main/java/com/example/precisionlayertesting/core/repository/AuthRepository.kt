@@ -1,9 +1,15 @@
-package com.example.precisionlayertesting.data.repository
+package com.example.precisionlayertesting.core.repository
 
+import com.example.precisionlayertesting.core.models.auth.Invitation
+import com.example.precisionlayertesting.core.models.auth.LoginRequest
+import com.example.precisionlayertesting.core.models.auth.LoginResponse
+import com.example.precisionlayertesting.core.models.auth.ProfileRequest
+import com.example.precisionlayertesting.core.models.auth.Workspace
+import com.example.precisionlayertesting.core.models.auth.WorkspaceMember
+import com.example.precisionlayertesting.core.models.auth.WorkspaceMemberDetailed
 import com.example.precisionlayertesting.core.utils.Result
 import com.example.precisionlayertesting.core.utils.PrefsManager
-import com.example.precisionlayertesting.data.models.auth.*
-import com.example.precisionlayertesting.data.remote.AuthApiService
+import com.example.precisionlayertesting.core.remote.AuthApiService
 
 class AuthRepository(
     private val authApiService: AuthApiService,
@@ -141,7 +147,12 @@ class AuthRepository(
     ): Result<Unit> {
         return try {
             // STEP 1: Create workspace
-            val wsResponse = authApiService.createWorkspace(Workspace(name = workspaceName, createdBy = userId))
+            val wsResponse = authApiService.createWorkspace(
+                Workspace(
+                    name = workspaceName,
+                    createdBy = userId
+                )
+            )
             if (wsResponse.isSuccessful) {
                 val workspaceId = wsResponse.body()?.firstOrNull()?.id
                 if (workspaceId != null) {

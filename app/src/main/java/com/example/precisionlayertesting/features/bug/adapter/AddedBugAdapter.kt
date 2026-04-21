@@ -1,9 +1,9 @@
-package com.example.precisionlayertesting.features.bug
+package com.example.precisionlayertesting.features.bug.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.precisionlayertesting.data.models.bug.BugReport
+import com.example.precisionlayertesting.core.models.bugModel.BugReport
 import com.example.precisionlayertesting.databinding.ItemAddedBugBinding
 
 class AddedBugAdapter(private val bugs: List<BugReport>) :
@@ -21,7 +21,7 @@ class AddedBugAdapter(private val bugs: List<BugReport>) :
         holder.binding.tvBugTitle.text = bug.title
         holder.binding.tvSeverityBadge.text = bug.severity.uppercase()
         holder.binding.tvModuleName.text = "Authentication Engine" // Dummy for now
-        
+
         // Handle edit/delete actions if needed
 
 

@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.precisionlayertesting.core.base.BaseViewModel
 import com.example.precisionlayertesting.core.utils.PrefsManager
 import com.example.precisionlayertesting.core.utils.Result
-import com.example.precisionlayertesting.data.models.bug.Module
-import com.example.precisionlayertesting.data.repository.BugRepository
+import com.example.precisionlayertesting.core.models.bugModel.Module
+import com.example.precisionlayertesting.core.repository.BugRepository
 import kotlinx.coroutines.launch
 
 class DashboardViewModel(

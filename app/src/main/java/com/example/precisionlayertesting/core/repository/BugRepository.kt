@@ -1,21 +1,38 @@
-package com.example.precisionlayertesting.data.repository
+package com.example.precisionlayertesting.core.repository
 
 import com.example.precisionlayertesting.core.utils.Result
-import com.example.precisionlayertesting.data.models.bug.*
-import com.example.precisionlayertesting.data.remote.BugApiService
+import com.example.precisionlayertesting.core.remote.BugApiService
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType
 import okhttp3.RequestBody
-import com.example.precisionlayertesting.data.remote.R2ApiService
+import com.example.precisionlayertesting.core.remote.R2ApiService
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import com.example.precisionlayertesting.core.models.bugModel.ApkValidationRequest
+import com.example.precisionlayertesting.core.models.bugModel.ApkValidationResponse
+import com.example.precisionlayertesting.core.models.bugModel.AppVersion
+import com.example.precisionlayertesting.core.models.bugModel.AppVersionCreateRequest
+import com.example.precisionlayertesting.core.models.bugModel.BugReport
+import com.example.precisionlayertesting.core.models.bugModel.BugReportCreateRequest
+import com.example.precisionlayertesting.core.models.bugModel.ConfirmUploadRequest
+import com.example.precisionlayertesting.core.models.bugModel.DeleteFileRequest
+import com.example.precisionlayertesting.core.models.bugModel.Module
+import com.example.precisionlayertesting.core.models.bugModel.ModuleCreateRequest
+import com.example.precisionlayertesting.core.models.bugModel.ScreenshotBatchPrepareRequest
+import com.example.precisionlayertesting.core.models.bugModel.ScreenshotBatchPrepareResponse
+import com.example.precisionlayertesting.core.models.bugModel.TestingSession
+import com.example.precisionlayertesting.core.models.bugModel.TestingSessionCreateRequest
+import kotlinx.coroutines.delay
+import okio.BufferedSink
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
+import java.io.IOException
 import java.util.UUID
 
 class BugRepository(
@@ -137,7 +154,7 @@ class BugRepository(
                     val file = File(uri.path ?: "")
                     if (!file.exists()) {
                         Log.e("BugRepository", "File does not exist: ${file.absolutePath}")
-                        throw java.io.FileNotFoundException("File does not exist: ${file.absolutePath}")
+                        throw FileNotFoundException("File does not exist: ${file.absolutePath}")
                     }
                     file.length()
                 } else {
@@ -320,7 +337,7 @@ class BugRepository(
             }
             
             if (attempt < maxRetries) {
-                kotlinx.coroutines.delay(1000L * (attempt + 1))
+                delay(1000L * (attempt + 1))
             }
         }
         
@@ -335,7 +352,7 @@ class BugRepository(
         override fun contentType(): MediaType? = contentType
         override fun contentLength(): Long = data.size.toLong()
 
-        override fun writeTo(sink: okio.BufferedSink) {
+        override fun writeTo(sink: BufferedSink) {
             val total = contentLength()
             var uploaded = 0L
             val bufferSize = 8192
@@ -361,7 +378,7 @@ class BugRepository(
         override fun contentType(): MediaType? = contentType
         override fun contentLength(): Long = totalBytes
 
-        override fun writeTo(sink: okio.BufferedSink) {
+        override fun writeTo(sink: BufferedSink) {
             val buffer = ByteArray(8192)
             var bytesRead: Int
             var uploaded = 0L
@@ -372,7 +389,7 @@ class BugRepository(
                     uploaded += bytesRead
                     onProgress(uploaded, totalBytes)
                 }
-            } ?: throw java.io.IOException("Failed to open input stream for URI: $uri")
+            } ?: throw IOException("Failed to open input stream for URI: $uri")
         }
     }
 

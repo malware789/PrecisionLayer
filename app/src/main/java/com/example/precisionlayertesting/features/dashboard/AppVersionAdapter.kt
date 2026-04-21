@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.precisionlayertesting.R
-import com.example.precisionlayertesting.data.models.bug.AppVersion
+import com.example.precisionlayertesting.core.models.bugModel.AppVersion
 import com.example.precisionlayertesting.databinding.ItemAppVersionBinding
 
 class AppVersionAdapter(

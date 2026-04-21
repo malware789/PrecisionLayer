@@ -7,15 +7,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.precisionlayertesting.core.utils.PrefsManager
 import com.example.precisionlayertesting.core.utils.Result
-import com.example.precisionlayertesting.data.models.bug.AppVersion
-import com.example.precisionlayertesting.data.models.bug.AppVersionCreateRequest
-import com.example.precisionlayertesting.data.repository.BugRepository
+import com.example.precisionlayertesting.core.models.bugModel.AppVersion
+import com.example.precisionlayertesting.core.repository.BugRepository
 import kotlinx.coroutines.launch
 
 import com.example.precisionlayertesting.core.utils.ApkMetadataExtractor
 import com.example.precisionlayertesting.core.utils.ApkMetadata
-import com.example.precisionlayertesting.data.models.bug.ApkValidationRequest
-import com.example.precisionlayertesting.data.models.bug.ConfirmUploadRequest
+import com.example.precisionlayertesting.core.models.bugModel.ApkValidationRequest
+import com.example.precisionlayertesting.core.models.bugModel.ConfirmUploadRequest
 import android.net.Uri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

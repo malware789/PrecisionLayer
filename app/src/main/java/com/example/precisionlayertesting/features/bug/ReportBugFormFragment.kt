@@ -7,23 +7,25 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.precisionlayertesting.R
 import com.example.precisionlayertesting.core.di.ManualDI
-import com.example.precisionlayertesting.data.models.bug.BugDraft
-import com.example.precisionlayertesting.data.models.bug.BugReport
+import com.example.precisionlayertesting.core.models.bugModel.BugDraft
+import com.example.precisionlayertesting.core.models.bugModel.BugReport
 import com.example.precisionlayertesting.databinding.FragmentReportBugFormBinding
+import com.example.precisionlayertesting.features.bug.adapter.AddedBugsAdapter
 import com.google.android.material.snackbar.Snackbar
+import java.util.UUID
 
 class ReportBugFormFragment : Fragment() {
 
@@ -59,6 +61,8 @@ class ReportBugFormFragment : Fragment() {
 
     private val addedBugsAdapter = AddedBugsAdapter()
 
+    private var lastBackPressedTime: Long = 0L
+
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let { viewModel.onScreenshotSelected(requireContext(), it) }
     }
@@ -71,11 +75,47 @@ class ReportBugFormFragment : Fragment() {
         return binding.root
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         setupUI()
         observeViewModel()
+        setupBackPressHandling()
+    }
+
+    private fun setupBackPressHandling() {
+//        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
+//           override fun handleOnBackPressed() {
+//                val hasDrafts = viewModel.draftBugs.value?.isNotEmpty() == true
+//                val hasText = !binding.etBugTitle.text.isNullOrBlank() || !binding.etDescription.text.isNullOrBlank()
+//
+//                if (hasDrafts || hasText) {
+//                    if (System.currentTimeMillis() - lastBackPressedTime < 2000) {
+//                        isEnabled = false
+//                        requireActivity().onBackPressed()
+//                    } else {
+//                        lastBackPressedTime = System.currentTimeMillis()
+//                        Toast.makeText(requireContext(), "Press back again to exit and lose unsaved data", Toast.LENGTH_SHORT).show()
+//                    }
+//                } else {
+//                    isEnabled = false
+//                    requireActivity().onBackPressed()
+//                }
+//            }
+//        })
+
+
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner){
+            if (System.currentTimeMillis() - lastBackPressedTime < 2000) {
+                findNavController().popBackStack()
+            }
+            else {
+                lastBackPressedTime = System.currentTimeMillis()
+                Toast.makeText(requireContext(), "Press back again to exit", Toast.LENGTH_SHORT).show()
+            }
+        }
+
     }
 
     private fun setupRecyclerView() {
@@ -84,8 +124,15 @@ class ReportBugFormFragment : Fragment() {
             adapter = addedBugsAdapter
         }
         addedBugsAdapter.onDeleteItem = { index -> 
-            viewModel.removeDraftAt(index)
-            if (editingDraftIndex == index) cancelEdit()
+            com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Remove Bug Draft?")
+                .setMessage("Are you sure you want to remove this bug draft?")
+                .setPositiveButton("Remove") { _, _ ->
+                    viewModel.removeDraftAt(index)
+                    if (editingDraftIndex == index) cancelEdit()
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
         }
         addedBugsAdapter.onEditItem = { index -> 
             loadForEdit(index)
@@ -219,15 +266,23 @@ class ReportBugFormFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            // Show confirmation dialog
-            val count = (viewModel.draftBugs.value?.size ?: 0) + (if (currentFormValid) 1 else 0)
+            // Correct count logic: 
+            // If editing, the form bug is already one of the drafts.
+            // If NOT editing and form is valid, it's an extra bug (+1).
+            val draftsCount = viewModel.draftBugs.value?.size ?: 0
+            val isEditing = editingDraftIndex != null
+            val count = if (isEditing || !currentFormValid) draftsCount else draftsCount + 1
             
             com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Submit Bug Reports")
                 .setMessage("You are about to submit $count bug report(s). Continue?")
                 .setPositiveButton("Submit") { _, _ ->
                     val finalBug = if (currentFormValid) {
+                        val currentDrafts = viewModel.draftBugs.value.orEmpty()
+                        val existingId = if (isEditing) currentDrafts.getOrNull(editingDraftIndex!!)?.id else null
+                        
                         BugDraft(
+                            id = existingId ?: UUID.randomUUID().toString(),
                             title = binding.etBugTitle.text.toString().trim(),
                             component = binding.atvComponent.text.toString().trim(),
                             severity = getSelectedSeverity(),
@@ -349,6 +404,10 @@ class ReportBugFormFragment : Fragment() {
                 binding.attachmentPlaceholder.visibility = View.GONE
                 binding.ivScreenshotPreview.visibility = View.VISIBLE
                 binding.ivDeleteScreenshot.visibility = View.VISIBLE
+                
+                binding.ivScreenshotPreview.setOnClickListener {
+                    showFullscreenImage(uri)
+                }
             }
              else {
                 binding.ivScreenshotPreview.setImageDrawable(null)
@@ -418,6 +477,20 @@ class ReportBugFormFragment : Fragment() {
             description = binding.etDescription.text.toString().trim(),
             steps = getStepsString().ifBlank { null }
         )
+    }
+
+    private fun showFullscreenImage(uri: Uri) {
+        val imageView = ImageView(requireContext()).apply {
+            setPadding(32, 32, 32, 32)
+            setImageURI(uri)
+            adjustViewBounds = true
+        }
+        
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+            .setView(imageView)
+            .setPositiveButton("Close", null)
+            .show()
+
     }
 
     private fun resetForm() {

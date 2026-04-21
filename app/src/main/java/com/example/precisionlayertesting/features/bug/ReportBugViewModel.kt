@@ -1,22 +1,25 @@
 package com.example.precisionlayertesting.features.bug
 
 import android.net.Uri
-import android.os.Parcelable
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.precisionlayertesting.core.models.bugModel.BugDraft
+import com.example.precisionlayertesting.core.models.bugModel.BugReportCreateRequest
+import com.example.precisionlayertesting.core.models.bugModel.FileRequest
+import com.example.precisionlayertesting.core.models.bugModel.Module
+import com.example.precisionlayertesting.core.models.bugModel.ScreenshotBatchPrepareRequest
+import com.example.precisionlayertesting.core.models.bugModel.TestingSessionCreateRequest
 import com.example.precisionlayertesting.core.utils.Result
-import com.example.precisionlayertesting.data.models.bug.*
-import com.example.precisionlayertesting.data.repository.BugRepository
+import com.example.precisionlayertesting.core.repository.BugRepository
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
-import kotlinx.parcelize.Parcelize
 import java.util.UUID
 import java.io.File
 
@@ -230,8 +233,21 @@ class ReportBugViewModel(
                 _submissionState.value = SubmissionState.Submitting
                 
                 // Consolidate list immediately to avoid LiveData race conditions
-                val bugs = draftBugs.value.orEmpty().toMutableList()
-                finalBugToAdd?.let { bugs.add(it) }
+                val drafts = draftBugs.value.orEmpty().toMutableList()
+                val bugs = if (finalBugToAdd != null) {
+                    val existingIndex = drafts.indexOfFirst { it.id == finalBugToAdd.id }
+                    if (existingIndex != -1) {
+                        // Replace the draft with the newest form data
+                        drafts[existingIndex] = finalBugToAdd
+                        drafts
+                    } else {
+                        // Append as new bug
+                        drafts.add(finalBugToAdd)
+                        drafts
+                    }
+                } else {
+                    drafts
+                }
                 
                 if (bugs.isEmpty()) {
                     throw Exception("No bugs to submit")

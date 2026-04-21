@@ -9,8 +9,8 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.precisionlayertesting.core.di.ManualDI
 import com.example.precisionlayertesting.core.utils.Result
-import com.example.precisionlayertesting.data.models.auth.WorkspaceMemberDetailed
 import com.example.precisionlayertesting.databinding.BottomSheetWorkspaceSwitcherBinding
+import com.example.precisionlayertesting.features.auth.adapter.WorkspaceSwitcherAdapter
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class WorkspaceSwitcherBottomSheet(
@@ -53,7 +53,10 @@ class WorkspaceSwitcherBottomSheet(
     }
 
     private fun setUpList() {
-        adapter = WorkspaceSwitcherAdapter(emptyList(), ManualDI.prefsManager.getWorkspaceId()) { selected ->
+        adapter = WorkspaceSwitcherAdapter(
+            emptyList(),
+            ManualDI.prefsManager.getWorkspaceId()
+        ) { selected ->
             viewModel.switchWorkspace(selected)
             onSwitched()
             dismiss()

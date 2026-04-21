@@ -1,6 +1,21 @@
-package com.example.precisionlayertesting.data.remote
+package com.example.precisionlayertesting.core.remote
 
-import com.example.precisionlayertesting.data.models.bug.*
+import com.example.precisionlayertesting.core.models.bugModel.ApkValidationRequest
+import com.example.precisionlayertesting.core.models.bugModel.ApkValidationResponse
+import com.example.precisionlayertesting.core.models.bugModel.AppVersion
+import com.example.precisionlayertesting.core.models.bugModel.AppVersionCreateRequest
+import com.example.precisionlayertesting.core.models.bugModel.BugReport
+import com.example.precisionlayertesting.core.models.bugModel.BugReportCreateRequest
+import com.example.precisionlayertesting.core.models.bugModel.ConfirmUploadRequest
+import com.example.precisionlayertesting.core.models.bugModel.DeleteFileRequest
+import com.example.precisionlayertesting.core.models.bugModel.Module
+import com.example.precisionlayertesting.core.models.bugModel.ModuleCreateRequest
+import com.example.precisionlayertesting.core.models.bugModel.ScreenshotBatchPrepareRequest
+import com.example.precisionlayertesting.core.models.bugModel.ScreenshotBatchPrepareResponse
+import com.example.precisionlayertesting.core.models.bugModel.ScreenshotUploadRequest
+import com.example.precisionlayertesting.core.models.bugModel.ScreenshotUploadResponse
+import com.example.precisionlayertesting.core.models.bugModel.TestingSession
+import com.example.precisionlayertesting.core.models.bugModel.TestingSessionCreateRequest
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET

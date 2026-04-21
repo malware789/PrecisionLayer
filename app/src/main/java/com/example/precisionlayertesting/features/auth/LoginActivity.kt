@@ -8,7 +8,7 @@ import com.example.precisionlayertesting.MainActivity
 import com.example.precisionlayertesting.core.base.BaseActivity
 import com.example.precisionlayertesting.core.di.ManualDI
 import com.example.precisionlayertesting.core.utils.Result
-import com.example.precisionlayertesting.data.models.auth.LoginRequest
+import com.example.precisionlayertesting.core.models.auth.LoginRequest
 import com.example.precisionlayertesting.databinding.FragmentLoginBinding
 
 class LoginActivity : BaseActivity() {

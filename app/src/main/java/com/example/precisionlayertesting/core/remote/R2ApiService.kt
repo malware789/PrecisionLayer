@@ -1,4 +1,4 @@
-package com.example.precisionlayertesting.data.remote
+package com.example.precisionlayertesting.core.remote
 
 import okhttp3.RequestBody
 import retrofit2.Response

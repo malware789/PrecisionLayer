@@ -5,8 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.precisionlayertesting.core.base.BaseViewModel
 import com.example.precisionlayertesting.core.utils.Result
-import com.example.precisionlayertesting.data.models.bug.BugReport
-import com.example.precisionlayertesting.data.repository.BugRepository
+import com.example.precisionlayertesting.core.models.bugModel.BugReport
+import com.example.precisionlayertesting.core.repository.BugRepository
 import kotlinx.coroutines.launch
 
 class BugViewModel(

@@ -11,7 +11,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.precisionlayertesting.R
 import com.example.precisionlayertesting.core.di.ManualDI
 import com.example.precisionlayertesting.core.utils.Result
-import com.example.precisionlayertesting.data.models.auth.LoginRequest
+import com.example.precisionlayertesting.core.models.auth.LoginRequest
 import com.example.precisionlayertesting.databinding.FragmentSignupBinding
 
 class SignupFragment : Fragment() {

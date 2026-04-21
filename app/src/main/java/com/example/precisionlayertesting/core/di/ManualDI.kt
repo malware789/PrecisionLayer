@@ -2,15 +2,14 @@ package com.example.precisionlayertesting.core.di
 
 import android.content.Context
 import com.example.precisionlayertesting.core.network.RetrofitClient
-import com.example.precisionlayertesting.data.remote.ApiService
-import com.example.precisionlayertesting.data.remote.BugApiService
-import com.example.precisionlayertesting.data.repository.BugRepository
+import com.example.precisionlayertesting.core.remote.BugApiService
+import com.example.precisionlayertesting.core.repository.BugRepository
 import com.example.precisionlayertesting.core.utils.PrefsManager
-import com.example.precisionlayertesting.data.remote.AuthApiService
-import com.example.precisionlayertesting.data.repository.AppRepository
-import com.example.precisionlayertesting.data.repository.AuthRepository
+import com.example.precisionlayertesting.core.remote.AuthApiService
+import com.example.precisionlayertesting.core.repository.AuthRepository
 import com.example.precisionlayertesting.core.network.PlainHttpClient
 import com.example.precisionlayertesting.core.network.TokenRefreshService
+import com.example.precisionlayertesting.core.remote.R2ApiService
 import com.example.precisionlayertesting.core.utils.ApkMetadataExtractor
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -23,13 +22,6 @@ object ManualDI {
         appContext = context.applicationContext
     }
 
-    private val apiService: ApiService by lazy {
-        RetrofitClient.retrofit.create(ApiService::class.java)
-    }
-
-    val appRepository: AppRepository by lazy {
-        AppRepository(apiService)
-    }
 
     private val authApiService: AuthApiService by lazy {
         RetrofitClient.retrofit.create(AuthApiService::class.java)
@@ -72,8 +64,8 @@ object ManualDI {
             .build()
     }
 
-    private val r2ApiService: com.example.precisionlayertesting.data.remote.R2ApiService by lazy {
-        r2Retrofit.create(com.example.precisionlayertesting.data.remote.R2ApiService::class.java)
+    private val r2ApiService: R2ApiService by lazy {
+        r2Retrofit.create(R2ApiService::class.java)
     }
 
     val bugRepository: BugRepository by lazy {

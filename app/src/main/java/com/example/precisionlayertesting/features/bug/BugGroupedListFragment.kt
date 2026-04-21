@@ -12,32 +12,33 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.precisionlayertesting.core.di.ManualDI
 import com.example.precisionlayertesting.core.utils.Result
-import com.example.precisionlayertesting.databinding.FragmentBugReportsBinding
+import com.example.precisionlayertesting.databinding.FragmentBugGroupedListBinding
+import com.example.precisionlayertesting.features.bug.adapter.TestingSessionAdapter
 
-class BugReportsFragment : Fragment() {
+class BugGroupedListFragment : Fragment() {
 
-    private var _binding: FragmentBugReportsBinding? = null
+    private var _binding: FragmentBugGroupedListBinding? = null
     private val binding get() = _binding!!
-
-    private val args: BugReportsFragmentArgs by navArgs()
-
-    private val viewModel: BugViewModel by lazy {
+    
+    private val args: BugGroupedListFragmentArgs by navArgs()
+    
+    private val viewModel: TestingSessionViewModel by lazy {
         ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
                 val workspaceId = ManualDI.prefsManager.getWorkspaceId() ?: ""
                 @Suppress("UNCHECKED_CAST")
-                return BugViewModel(ManualDI.bugRepository, args.sessionId, workspaceId) as T
+                return TestingSessionViewModel(ManualDI.bugRepository, args.versionId, workspaceId) as T
             }
-        })[BugViewModel::class.java]
+        })[TestingSessionViewModel::class.java]
     }
-
-    private lateinit var adapter: BugReportAdapter
+    
+    private lateinit var adapter: TestingSessionAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentBugReportsBinding.inflate(inflater, container, false)
+        _binding = FragmentBugGroupedListBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -49,25 +50,34 @@ class BugReportsFragment : Fragment() {
     }
 
     private fun setupUI() {
-        adapter = BugReportAdapter(emptyList()) { bug ->
-            val breadcrumb = "${args.moduleName} > ${args.versionName} > ${args.sessionTitle}"
-            val action = BugReportsFragmentDirections.actionBugReportsToBugDetails(
-                bugDetail = bug,
-                breadcrumb = breadcrumb
+        adapter = TestingSessionAdapter(emptyList()) { session ->
+            val action = BugGroupedListFragmentDirections.actionBugTrackingToBugReports(
+                moduleId = args.moduleId,
+                versionId = args.versionId,
+                sessionId = session.id,
+                moduleName = args.moduleName,
+                versionName = args.versionName,
+                sessionTitle = session.title,
+                testerName = session.userProfile?.fullName ?: "Tester"
             )
             findNavController().navigate(action)
         }
-        
-        binding.rvBugReports.layoutManager = LinearLayoutManager(requireContext())
-        binding.rvBugReports.adapter = adapter
-        
+        binding.rvTestingSessions.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvTestingSessions.adapter = adapter
+
         binding.fabAddBug.setOnClickListener {
-             Toast.makeText(requireContext(), "Coming soon", Toast.LENGTH_SHORT).show()
+            val action = BugGroupedListFragmentDirections.actionBugTrackingFragmentToReportBugFormFragment(
+                moduleId = args.moduleId,
+                versionId = args.versionId,
+                moduleName = args.moduleName,
+                versionName = args.versionName
+            )
+            findNavController().navigate(action)
         }
     }
 
     private fun observeViewModel() {
-        viewModel.bugs.observe(viewLifecycleOwner) { result ->
+        viewModel.sessions.observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> { }
                 is Result.Success -> {

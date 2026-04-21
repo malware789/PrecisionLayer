@@ -128,94 +128,90 @@
                 android:layout_marginBottom="24dp" />
 
             <!-- Steps Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="STEPS TO REPRODUCE"
-                android:textColor="@color/on_surface_variant"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                android:textAllCaps="true"
-                android:letterSpacing="0.1"
-                android:layout_marginBottom="12dp" />
-
             <LinearLayout
-                android:id="@+id/llSteps"
+                android:id="@+id/llStepsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginBottom="24dp">
-                
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="1. Navigate to the Login page and sign in."
-                    android:textColor="@color/on_surface"
-                    android:textSize="13sp"
-                    android:layout_marginBottom="6dp" />
-                
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="2. Toggle 'Slow 3G' network throttling in dev tools."
-                    android:textColor="@color/on_surface"
-                    android:textSize="13sp"
-                    android:layout_marginBottom="6dp" />
+                android:orientation="vertical">
 
                 <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="STEPS TO REPRODUCE"
+                    android:textColor="@color/on_surface_variant"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.1"
+                    android:layout_marginBottom="12dp" />
+
+                <LinearLayout
+                    android:id="@+id/llStepsList"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="3. Refresh the page and observe console logs."
-                    android:textColor="@color/on_surface"
-                    android:textSize="13sp" />
+                    android:orientation="vertical"
+                    android:layout_marginBottom="24dp">
+                </LinearLayout>
             </LinearLayout>
 
             <!-- Evidence Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="EVIDENCE"
-                android:textColor="@color/on_surface_variant"
-                android:textSize="11sp"
-                android:textStyle="bold"
-                android:textAllCaps="true"
-                android:letterSpacing="0.1"
-                android:layout_marginBottom="12dp" />
-
             <LinearLayout
+                android:id="@+id/llEvidenceContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="24dp">
+                android:orientation="vertical">
 
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="#1A000000">
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="centerCrop"
-                        tools:src="@tools:sample/backgrounds/scenic" />
-                </com.google.android.material.card.MaterialCardView>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="EVIDENCE"
+                    android:textColor="@color/on_surface_variant"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="true"
+                    android:letterSpacing="0.1"
+                    android:layout_marginBottom="12dp" />
 
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:layout_marginStart="12dp"
-                    app:cardCornerRadius="12dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="#1A000000">
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="centerCrop"
-                        tools:src="@tools:sample/backgrounds/scenic" />
-                </com.google.android.material.card.MaterialCardView>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="24dp">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cvEvidenceImage"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="#1A000000">
+                        <ImageView
+                            android:id="@+id/ivEvidenceImage"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop"
+                            tools:src="@tools:sample/backgrounds/scenic"
+                            />
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cvEvidenceImage2"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:layout_marginStart="12dp"
+                        android:visibility="gone"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="#1A000000">
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop"
+                            tools:src="@tools:sample/backgrounds/scenic" />
+                    </com.google.android.material.card.MaterialCardView>
+                </LinearLayout>
             </LinearLayout>
 
             <!-- Activity Timeline -->
@@ -230,66 +226,11 @@
                 android:letterSpacing="0.1"
                 android:layout_marginBottom="16dp" />
 
-            <!-- Timeline Item 1 -->
             <LinearLayout
+                android:id="@+id/llTimelineList"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-                <View
-                    android:layout_width="2dp"
-                    android:layout_height="match_parent"
-                    android:background="#E9EDFF"
-                    android:layout_marginHorizontal="8dp" />
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingBottom="16dp">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Bug Created • Sarah Jenkins"
-                        android:textColor="@color/on_surface"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Today at 10:24 AM"
-                        android:textColor="@color/on_surface_variant"
-                        android:textSize="11sp" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <!-- Timeline Item 2 -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-                <View
-                    android:layout_width="2dp"
-                    android:layout_height="match_parent"
-                    android:background="#E9EDFF"
-                    android:layout_marginHorizontal="8dp" />
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingBottom="16dp">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Priority Raised to Critical"
-                        android:textColor="#dc2626"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Today at 10:28 AM • Security Shield"
-                        android:textColor="@color/on_surface_variant"
-                        android:textSize="11sp" />
-                </LinearLayout>
+                android:orientation="vertical">
             </LinearLayout>
 
         </LinearLayout>

@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.precisionlayertesting.data.models.auth.Invitation
+import com.example.precisionlayertesting.core.models.auth.Invitation
 import com.example.precisionlayertesting.databinding.ItemInvitationBinding
 import java.util.Locale
 

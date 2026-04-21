@@ -1,10 +1,10 @@
-package com.example.precisionlayertesting.features.auth
+package com.example.precisionlayertesting.features.auth.adapter
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.precisionlayertesting.data.models.auth.WorkspaceMemberDetailed
+import com.example.precisionlayertesting.core.models.auth.WorkspaceMemberDetailed
 import com.example.precisionlayertesting.databinding.ItemWorkspaceSwitcherBinding
 
 class WorkspaceSwitcherAdapter(
@@ -39,10 +39,10 @@ class WorkspaceSwitcherAdapter(
         fun bind(item: WorkspaceMemberDetailed) {
             binding.tvWorkspaceName.text = item.workspace.name
             binding.tvRole.text = "Role: ${item.role.capitalize()}"
-            
+
             val isSelected = item.workspaceId == currentWorkspaceId
             binding.ivCheck.visibility = if (isSelected) View.VISIBLE else View.INVISIBLE
-            
+
             binding.root.setOnClickListener {
                 onWorkspaceSelected(item)
             }

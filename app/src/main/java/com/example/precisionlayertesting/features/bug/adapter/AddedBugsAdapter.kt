@@ -1,11 +1,11 @@
-package com.example.precisionlayertesting.features.bug
+package com.example.precisionlayertesting.features.bug.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.precisionlayertesting.data.models.bug.BugDraft
+import com.example.precisionlayertesting.core.models.bugModel.BugDraft
 import com.example.precisionlayertesting.databinding.ItemAddedBugBinding
 
 class AddedBugsAdapter : ListAdapter<BugDraft, AddedBugsAdapter.ViewHolder>(DIFF) {
@@ -15,9 +15,9 @@ class AddedBugsAdapter : ListAdapter<BugDraft, AddedBugsAdapter.ViewHolder>(DIFF
 
     companion object {
         private val DIFF = object : DiffUtil.ItemCallback<BugDraft>() {
-            override fun areItemsTheSame(a: BugDraft, b: BugDraft) = 
+            override fun areItemsTheSame(a: BugDraft, b: BugDraft) =
                 a.title == b.title && a.description == b.description
-            override fun areContentsTheSame(a: BugDraft, b: BugDraft) = 
+            override fun areContentsTheSame(a: BugDraft, b: BugDraft) =
                 a == b
         }
     }
@@ -26,8 +26,8 @@ class AddedBugsAdapter : ListAdapter<BugDraft, AddedBugsAdapter.ViewHolder>(DIFF
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(
-            draft: BugDraft, 
-            position: Int, 
+            draft: BugDraft,
+            position: Int,
             onDelete: (Int) -> Unit,
             onEdit: (Int) -> Unit
         ) {
@@ -47,8 +47,8 @@ class AddedBugsAdapter : ListAdapter<BugDraft, AddedBugsAdapter.ViewHolder>(DIFF
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(
-            getItem(position), 
-            position, 
+            getItem(position),
+            position,
             onDelete = { idx -> onDeleteItem?.invoke(idx) },
             onEdit = { idx -> onEditItem?.invoke(idx) }
         )

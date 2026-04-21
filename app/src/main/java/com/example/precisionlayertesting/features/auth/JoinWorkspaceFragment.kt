@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.precisionlayertesting.R
 import com.example.precisionlayertesting.core.di.ManualDI
 import com.example.precisionlayertesting.core.utils.Result
-import com.example.precisionlayertesting.data.models.auth.Invitation
 import com.example.precisionlayertesting.databinding.FragmentJoinWorkspaceBinding
 
 class JoinWorkspaceFragment : Fragment() {

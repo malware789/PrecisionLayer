@@ -1,4 +1,4 @@
-package com.example.precisionlayertesting.data.models.dashboard
+package com.example.precisionlayertesting.core.models.dashboard
 
 data class AppVersion(
     val versionNumber: String,

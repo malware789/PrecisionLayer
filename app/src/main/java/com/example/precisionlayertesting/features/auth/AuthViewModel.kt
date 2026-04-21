@@ -4,9 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.precisionlayertesting.core.models.auth.Invitation
+import com.example.precisionlayertesting.core.models.auth.LoginRequest
+import com.example.precisionlayertesting.core.models.auth.LoginResponse
+import com.example.precisionlayertesting.core.models.auth.WorkspaceMember
+import com.example.precisionlayertesting.core.models.auth.WorkspaceMemberDetailed
 import com.example.precisionlayertesting.core.utils.Result
-import com.example.precisionlayertesting.data.models.auth.*
-import com.example.precisionlayertesting.data.repository.AuthRepository
+import com.example.precisionlayertesting.core.repository.AuthRepository
 import kotlinx.coroutines.launch
 
 class AuthViewModel(private val repository: AuthRepository) : ViewModel() {

@@ -1,6 +1,12 @@
-package com.example.precisionlayertesting.data.remote
+package com.example.precisionlayertesting.core.remote
 
-import com.example.precisionlayertesting.data.models.auth.*
+import com.example.precisionlayertesting.core.models.auth.Invitation
+import com.example.precisionlayertesting.core.models.auth.LoginRequest
+import com.example.precisionlayertesting.core.models.auth.LoginResponse
+import com.example.precisionlayertesting.core.models.auth.ProfileRequest
+import com.example.precisionlayertesting.core.models.auth.Workspace
+import com.example.precisionlayertesting.core.models.auth.WorkspaceMember
+import com.example.precisionlayertesting.core.models.auth.WorkspaceMemberDetailed
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -65,6 +71,6 @@ interface AuthApiService {
     @POST("auth/v1/token?grant_type=refresh_token")
     suspend fun refreshToken(
         @Body body: Map<String, String>
-    ): retrofit2.Response<LoginResponse>
+    ): Response<LoginResponse>
 
 }

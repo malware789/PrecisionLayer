@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -20,6 +21,7 @@ class DashboardFragment : Fragment() {
 
     private lateinit var viewModel: DashboardViewModel
     private lateinit var adapter: ModuleAdapter
+    private var lastBackPressedTime: Long = 0L
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,6 +41,7 @@ class DashboardFragment : Fragment() {
             }
         })[DashboardViewModel::class.java]
 
+        handleOnBackPressed()
         setupRecyclerView()
         observeViewModel()
     }
@@ -83,7 +86,20 @@ class DashboardFragment : Fragment() {
 
         binding.fabUpload.visibility = View.VISIBLE
     }
-
+    private fun handleOnBackPressed() {
+        // Correct syntax for the modern Back Press API
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            if (System.currentTimeMillis() - lastBackPressedTime < 2000) {
+                // Disable this callback so the next call triggers the activity's default behavior
+                isEnabled = false
+                requireActivity().onBackPressed()
+            }
+            else {
+                lastBackPressedTime = System.currentTimeMillis()
+                Toast.makeText(requireContext(), "Press back again to exit", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

@@ -47,9 +47,9 @@
 
     <fragment
         android:id="@+id/bugTrackingFragment"
-        android:name="com.example.precisionlayertesting.features.bug.BugTrackingFragment"
+        android:name="com.example.precisionlayertesting.features.bug.BugGroupedListFragment"
         android:label="Bug Tracking"
-        tools:layout="@layout/fragment_bug_tracking"
+        tools:layout="@layout/fragment_bug_grouped_list"
         >
 
         <argument
@@ -67,7 +67,7 @@
 
         <action
             android:id="@+id/action_bugTracking_to_bugReports"
-            app:destination="@id/bugReportsFragment" />
+            app:destination="@id/bugListFragment" />
 
 
         <action
@@ -77,10 +77,10 @@
 
 
     <fragment
-        android:id="@+id/bugReportsFragment"
-        android:name="com.example.precisionlayertesting.features.bug.BugReportsFragment"
+        android:id="@+id/bugListFragment"
+        android:name="com.example.precisionlayertesting.features.bug.BugListFragment"
         android:label="Bug Reports"
-        tools:layout="@layout/fragment_bug_reports" >
+        tools:layout="@layout/fragment_bug_list" >
         <argument
             android:name="moduleId"
             app:argType="string" />
@@ -99,12 +99,16 @@
         <argument
             android:name="sessionTitle"
             app:argType="string" />
+        <argument
+            android:name="testerName"
+            app:argType="string"
+            android:defaultValue="Tester" />
 
         <action
             android:id="@+id/action_bugReports_to_bugDetails"
             app:destination="@id/reportedBugDetailsFragment" />
         <action
-            android:id="@+id/action_bugReportsFragment_to_reportBugFormFragment"
+            android:id="@+id/action_bugListFragment_to_reportBugFormFragment"
             app:destination="@id/reportBugFormFragment" />
     </fragment>
 
@@ -115,7 +119,7 @@
         tools:layout="@layout/fragment_reported_bug_details">
         <argument
             android:name="bugDetail"
-            app:argType="com.example.precisionlayertesting.data.models.bug.BugReport" />
+            app:argType="com.example.precisionlayertesting.core.models.bugModel.BugReport" />
         <argument
             android:name="breadcrumb"
             app:argType="string" />

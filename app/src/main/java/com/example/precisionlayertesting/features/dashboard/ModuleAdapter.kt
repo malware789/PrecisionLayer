@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.precisionlayertesting.data.models.bug.Module
+import com.example.precisionlayertesting.core.models.bugModel.Module
 import com.example.precisionlayertesting.databinding.ItemModuleBinding
 
 class ModuleAdapter(private var items: List<Module>) :

@@ -1,8 +1,10 @@
-package com.example.precisionlayertesting.data.models.bug
+package com.example.precisionlayertesting.core.models.bugModel
 
+import android.net.Uri
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
+import java.util.UUID
 
 @Parcelize
 data class Module(
@@ -185,13 +187,13 @@ data class UploadInfo(
 
 @Parcelize
 data class BugDraft(
-    val id: String = java.util.UUID.randomUUID().toString(),
+    val id: String = UUID.randomUUID().toString(),
     val title: String,
     val component: String,
     val severity: String,
     val description: String,
     val steps: String?,
-    val cachedUri: android.net.Uri? = null,
+    val cachedUri: Uri? = null,
     val imagePath: String? = null,
     val mimeType: String? = null,
     val isUploading: Boolean = false,
