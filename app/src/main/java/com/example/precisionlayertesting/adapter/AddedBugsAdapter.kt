@@ -39,7 +39,7 @@ class AddedBugsAdapter : ListAdapter<BugDraft, AddedBugsAdapter.ViewHolder>(DIFF
             // hide gracefully when empty/blank (locked-module flow)
             if (draft.component.isNotBlank()) {
                 binding.tvModuleName.visibility = View.VISIBLE
-                binding.tvModuleName.text = draft.component + draft
+                binding.tvModuleName.text = draft.component
             }
             else {
                 binding.tvModuleName.visibility = View.GONE
