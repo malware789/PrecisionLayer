@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.precisionlayertesting.core.di.ManualDI
 import com.example.precisionlayertesting.core.utils.Result
 import com.example.precisionlayertesting.databinding.FragmentBugListBinding
-import com.example.precisionlayertesting.features.bug.adapter.BugReportAdapter
+import com.example.precisionlayertesting.adapter.BugReportAdapter
 
 class BugListFragment : Fragment() {
 

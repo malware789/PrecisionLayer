@@ -445,4 +445,20 @@ class BugRepository(
             Result.Error(e)
         }
     }
+
+    suspend fun getScreenshotViewUrl(bugId: String): Result<String?> = withContext(Dispatchers.IO) {
+        try {
+            val request = com.example.precisionlayertesting.core.models.bugModel.ViewScreenshotRequest(bugId = bugId)
+            val response = apiService.viewScreenshot(request)
+            if (response.isSuccessful && response.body() != null) {
+                Result.Success(response.body()!!.viewUrl)
+            } else {
+                val errorBody = response.errorBody()?.string() ?: "Failed to get view screenshot URL"
+                Result.Error(Exception(errorBody))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "getScreenshotViewUrl exception: ${e.message}", e)
+            Result.Error(e)
+        }
+    }
 }

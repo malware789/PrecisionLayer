@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.precisionlayertesting.core.di.ManualDI
 import com.example.precisionlayertesting.core.utils.Result
 import com.example.precisionlayertesting.databinding.BottomSheetWorkspaceSwitcherBinding
-import com.example.precisionlayertesting.features.auth.adapter.WorkspaceSwitcherAdapter
+import com.example.precisionlayertesting.adapter.WorkspaceSwitcherAdapter
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class WorkspaceSwitcherBottomSheet(

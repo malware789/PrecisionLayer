@@ -1,4 +1,4 @@
-package com.example.precisionlayertesting.features.auth.adapter
+package com.example.precisionlayertesting.adapter
 
 import android.view.LayoutInflater
 import android.view.View

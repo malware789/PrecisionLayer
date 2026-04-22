@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -23,21 +24,30 @@
             android:paddingTop="16dp"
             android:paddingBottom="50dp">
 
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:layout_marginBottom="12dp">
-                <TextView
-                    android:id="@+id/tvFormTitle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Bug Information"
-                    android:textColor="@color/on_surface"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                android:layout_marginBottom="10dp">
+
+<!--                <TextView-->
+<!--                    android:id="@+id/tvFormTitle"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:text="Bug Information"-->
+<!--                    android:textColor="@color/on_surface"-->
+<!--                    android:textSize="13sp"-->
+<!--                    android:textStyle="bold" />-->
+
                 <TextView
                     android:id="@+id/tvBugCount"
                     android:layout_width="wrap_content"
@@ -49,7 +59,29 @@
                     android:text="0 Bugs"
                     android:textColor="@color/primary"
                     android:textSize="12sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+
+                    />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAddAnotherBug"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="+ Add Bug"
+                    android:textAllCaps="false"
+                    android:textStyle="bold"
+                    android:paddingHorizontal="10dp"
+                    android:backgroundTint="@color/primary_fixed_dim2"
+                    />
+
+
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
@@ -64,6 +96,9 @@
                 tools:listitem="@layout/item_added_bug"
                 />
 
+        </LinearLayout>
+
+
 
 <!--            <TextView-->
 <!--                android:layout_width="wrap_content"-->
@@ -74,32 +109,6 @@
 <!--                android:textStyle="bold"-->
 <!--                android:letterSpacing="0.1"-->
 <!--                android:layout_marginBottom="10dp" />-->
-
-            <!-- Bug Title -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Bug Title"
-                android:textColor="@color/on_surface"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="5dp" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilBugTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                app:hintEnabled="false">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etBugTitle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Briefly describe the issue..."
-                    android:textSize="14sp"
-                    android:padding="16dp"
-                    android:background="@drawable/bg_outline_ghost" />
-            </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Module Dropdown -->
             <TextView
@@ -126,6 +135,33 @@
                     android:inputType="none"
                     android:textSize="14sp" />
             </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Bug Title -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:text="Bug Title"
+                android:textColor="@color/on_surface"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilBugTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                app:hintEnabled="false">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etBugTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Briefly describe the issue..."
+                    android:textSize="14sp"
+                    android:padding="16dp"
+                    android:background="@drawable/bg_outline_ghost" />
+            </com.google.android.material.textfield.TextInputLayout>
+
 
             <!-- Priority Toggle -->
             <TextView
@@ -216,32 +252,41 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="5dp" />
 
-            <LinearLayout
-                android:id="@+id/llStepsContainer"
+            <com.example.precisionlayertesting.core.utils.MaxHeightScrollView
+                android:id="@+id/stepScrollView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-                <!-- Step 1 example -->
+                >
+
                 <LinearLayout
+                    android:id="@+id/llStepsContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="8dp">
-                    <TextView
-                        android:layout_width="24dp"
-                        android:layout_height="wrap_content"
-                        android:text="1."
-                        android:textColor="@color/primary"
-                        android:textStyle="bold" />
-                    <EditText
+                    android:orientation="vertical">
+                    <!-- Step 1 example -->
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Navigate to Login screen"
-                        android:background="@null"
-                        android:textSize="13sp" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="8dp">
+                        <TextView
+                            android:layout_width="24dp"
+                            android:layout_height="wrap_content"
+                            android:text="1."
+                            android:textColor="@color/primary"
+                            android:textStyle="bold" />
+                        <EditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Navigate to Login screen"
+                            android:background="@null"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+
                 </LinearLayout>
-            </LinearLayout>
+            </com.example.precisionlayertesting.core.utils.MaxHeightScrollView>
+
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAddStep"
@@ -326,17 +371,6 @@
                     android:visibility="gone" />
             </FrameLayout>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnAddAnotherBug"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:text="+ Add Another Bug"
-                android:textAllCaps="false"
-                android:textStyle="bold"
-                android:backgroundTint="@color/primary_fixed_dim2"
-                />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

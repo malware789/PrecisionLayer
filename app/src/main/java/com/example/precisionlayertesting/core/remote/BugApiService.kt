@@ -16,6 +16,8 @@ import com.example.precisionlayertesting.core.models.bugModel.ScreenshotUploadRe
 import com.example.precisionlayertesting.core.models.bugModel.ScreenshotUploadResponse
 import com.example.precisionlayertesting.core.models.bugModel.TestingSession
 import com.example.precisionlayertesting.core.models.bugModel.TestingSessionCreateRequest
+import com.example.precisionlayertesting.core.models.bugModel.ViewScreenshotRequest
+import com.example.precisionlayertesting.core.models.bugModel.ViewScreenshotResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -111,4 +113,9 @@ interface BugApiService {
     suspend fun deleteR2File(
         @Body request: DeleteFileRequest
     ): Response<Unit>
+
+    @POST("functions/v1/view-bug-screenshot")
+    suspend fun viewScreenshot(
+        @Body request: ViewScreenshotRequest
+    ): Response<ViewScreenshotResponse>
 }

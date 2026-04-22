@@ -159,6 +159,15 @@ data class ScreenshotUploadResponse(
     @SerializedName("file_path") val filePath: String
 )
 
+data class ViewScreenshotRequest(
+    @SerializedName("bug_id") val bugId: String
+)
+
+data class ViewScreenshotResponse(
+    @SerializedName("view_url") val viewUrl: String?,
+    @SerializedName("message") val message: String? = null
+)
+
 data class DeleteFileRequest(
     @SerializedName("workspace_id") val workspaceId: String,
     @SerializedName("file_path") val filePath: String

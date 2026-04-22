@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.precisionlayertesting.core.di.ManualDI
 import com.example.precisionlayertesting.core.utils.Result
 import com.example.precisionlayertesting.databinding.FragmentBugGroupedListBinding
-import com.example.precisionlayertesting.features.bug.adapter.TestingSessionAdapter
+import com.example.precisionlayertesting.adapter.TestingSessionAdapter
 
 class BugGroupedListFragment : Fragment() {
 

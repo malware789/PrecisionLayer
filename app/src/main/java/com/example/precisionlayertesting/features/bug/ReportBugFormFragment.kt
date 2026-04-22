@@ -23,7 +23,7 @@ import com.example.precisionlayertesting.core.di.ManualDI
 import com.example.precisionlayertesting.core.models.bugModel.BugDraft
 import com.example.precisionlayertesting.core.models.bugModel.BugReport
 import com.example.precisionlayertesting.databinding.FragmentReportBugFormBinding
-import com.example.precisionlayertesting.features.bug.adapter.AddedBugsAdapter
+import com.example.precisionlayertesting.adapter.AddedBugsAdapter
 import com.google.android.material.snackbar.Snackbar
 import java.util.UUID
 
@@ -78,6 +78,7 @@ class ReportBugFormFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         setupRecyclerView()
         setupUI()
         observeViewModel()
@@ -176,7 +177,7 @@ class ReportBugFormFragment : Fragment() {
         viewModel.restoreAttachmentForEdit(draft.cachedUri, draft.mimeType)
         
         binding.btnAddAnotherBug.text = "Update Bug"
-        binding.tvFormTitle.text = "Edit Bug Draft"
+//        binding.tvFormTitle.text = "Edit Bug Draft"
         
         // Scroll to top to see edit form
         binding.nestedScrollView.smoothScrollTo(0, 0)
@@ -191,8 +192,8 @@ class ReportBugFormFragment : Fragment() {
         editingDraftIndex = null
         resetForm()
         viewModel.clearAttachment()
-        binding.btnAddAnotherBug.text = "Add Another Bug"
-        binding.tvFormTitle.text = "Bug Information"
+        binding.btnAddAnotherBug.text = "+ Add Bug"
+//        binding.tvFormTitle.text = "Bug Information"
     }
 
     private fun setupUI() {
@@ -340,6 +341,7 @@ class ReportBugFormFragment : Fragment() {
             // Update counter
             binding.tvBugCount.text = "${drafts.size} Bug${if (drafts.size == 1) "" else "s"}"
             binding.tvBugCount.visibility = if (drafts.isEmpty()) View.GONE else View.VISIBLE
+
         }
 
         viewModel.isCurrentAttachmentUploading.observe(viewLifecycleOwner) { isUploading ->
@@ -350,8 +352,9 @@ class ReportBugFormFragment : Fragment() {
             if (isUploading) {
                 binding.btnAddAnotherBug.text = "Processing Image..."
                 binding.attachmentPlaceholder.isClickable = false
-            } else {
-                binding.btnAddAnotherBug.text = if (editingDraftIndex != null) "Update Bug" else "Add Another Bug"
+            }
+            else {
+                binding.btnAddAnotherBug.text = if (editingDraftIndex != null) "Update Bug" else "+ Add Bug"
                 binding.attachmentPlaceholder.isClickable = true
             }
         }
@@ -458,7 +461,7 @@ class ReportBugFormFragment : Fragment() {
             R.id.btnMed -> BugReport.SEVERITY_MEDIUM
             R.id.btnHigh -> BugReport.SEVERITY_HIGH
             R.id.btnCrit -> BugReport.SEVERITY_CRITICAL
-            else -> BugReport.SEVERITY_HIGH
+            else -> BugReport.SEVERITY_LOW
         }
     }
 
@@ -506,7 +509,7 @@ class ReportBugFormFragment : Fragment() {
         addStepRow(binding.llStepsContainer, 1)
 
         // Reset priority to HIGH
-        binding.togglePriority.check(R.id.btnHigh)
+        binding.togglePriority.check(R.id.btnLow)
 
         binding.ivScreenshotPreview.setImageDrawable(null)
         binding.attachmentPlaceholder.visibility = View.VISIBLE

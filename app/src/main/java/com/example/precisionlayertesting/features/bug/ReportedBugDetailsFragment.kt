@@ -14,13 +14,24 @@ import com.example.precisionlayertesting.R
 import com.example.precisionlayertesting.core.utils.BugStyleUtils
 import com.example.precisionlayertesting.databinding.FragmentReportedBugDetailsBinding
 import com.example.precisionlayertesting.core.network.SupabaseConfig
-
+import androidx.lifecycle.ViewModelProvider
+import com.example.precisionlayertesting.core.di.ManualDI
 class ReportedBugDetailsFragment : Fragment() {
 
     private var _binding: FragmentReportedBugDetailsBinding? = null
     private val binding get() = _binding!!
 
     private val args: ReportedBugDetailsFragmentArgs by navArgs()
+
+    private val viewModel: ReportedBugDetailsViewModel by lazy {
+        val factory = object : ViewModelProvider.Factory {
+            override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
+                return ReportedBugDetailsViewModel(ManualDI.bugRepository) as T
+            }
+        }
+        ViewModelProvider(this, factory)[ReportedBugDetailsViewModel::class.java]
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -79,22 +90,38 @@ class ReportedBugDetailsFragment : Fragment() {
         else {
             binding.llEvidenceContainer.visibility = View.VISIBLE
             
-            val imageUrl = bug.imagePath ?: ""
-            val fullUrl = if (imageUrl.startsWith("http")) {
-                imageUrl
-            } else {
-                "${SupabaseConfig.BASE_URL}storage/v1/object/public/bug_screenshots/$imageUrl"
+            // Set up observers
+            viewModel.loading.observe(viewLifecycleOwner) { isLoading ->
+                if (isLoading) {
+                    binding.ivEvidenceImage.setImageResource(R.drawable.shadow_profile) // or some loading graphic
+                }
             }
 
-            Glide.with(this)
-                .load(fullUrl)
-                .placeholder(R.drawable.shadow_profile)
-                .error(R.drawable.ic_cloud_upload) // Fallback for error
-                .into(binding.ivEvidenceImage)
-            
-            binding.cvEvidenceImage.setOnClickListener {
-                showFullscreenImage(fullUrl)
+            viewModel.error.observe(viewLifecycleOwner) { errorMessage ->
+                if (errorMessage != null) {
+                    binding.ivEvidenceImage.setImageResource(R.drawable.ic_cloud_upload)
+                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
+                }
             }
+
+            viewModel.viewUrl.observe(viewLifecycleOwner) { url ->
+                if (url != null) {
+                    Glide.with(this)
+                        .load(url)
+                        .placeholder(R.drawable.shadow_profile)
+                        .error(R.drawable.ic_cloud_upload) // Fallback for error
+                        .into(binding.ivEvidenceImage)
+                        
+                    binding.cvEvidenceImage.setOnClickListener {
+                        showFullscreenImage(url)
+                    }
+                } else {
+                    binding.llEvidenceContainer.visibility = View.GONE
+                }
+            }
+            
+            // Trigger fetch
+            viewModel.fetchScreenshotUrl(bug.id)
         }
 
         // Activity Timeline

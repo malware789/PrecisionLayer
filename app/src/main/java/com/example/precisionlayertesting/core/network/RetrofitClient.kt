@@ -53,15 +53,19 @@ object RetrofitClient {
 
     private val authInterceptor = okhttp3.Interceptor { chain ->
         val token = try {
-            ManualDI.prefsManager.getAccessToken() ?: SupabaseConfig.API_KEY
+            ManualDI.prefsManager.getAccessToken()
         } catch (e: Exception) {
-            SupabaseConfig.API_KEY
+            null
         }
 
-        val request = chain.request().newBuilder()
+        val requestBuilder = chain.request().newBuilder()
             .header("apikey", SupabaseConfig.API_KEY)
-            .header("Authorization", "Bearer $token")
-            .build()
+            
+        if (!token.isNullOrBlank() && token != SupabaseConfig.API_KEY) {
+            requestBuilder.header("Authorization", "Bearer $token")
+        }
+            
+        val request = requestBuilder.build()
         chain.proceed(request)
     }
 
