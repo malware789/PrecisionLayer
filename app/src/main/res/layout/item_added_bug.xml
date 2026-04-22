@@ -1,90 +1,202 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- item_added_bug.xml -->
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="250dp"
+    android:layout_width="200dp"
     android:layout_height="wrap_content"
-    android:layout_marginEnd="16dp"
-    android:layout_marginBottom="8dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginTop="2dp"
+    android:layout_marginBottom="2dp"
     app:cardCornerRadius="12dp"
     app:cardElevation="2dp"
-    app:strokeWidth="1dp"
-    app:strokeColor="#1A000000">
+    app:cardBackgroundColor="@color/surface">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="10dp">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp">
-
-            <TextView
-                android:id="@+id/tvBugTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:layout_toStartOf="@+id/tvSeverityBadge"
-                android:layout_marginEnd="12dp"
-                android:text="UI layout shift on login"
-                android:textColor="@color/on_surface"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:maxLines="1"
-                android:ellipsize="end" />
-
-            <TextView
-                android:id="@+id/tvSeverityBadge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:background="@drawable/bg_badge_pill"
-                android:backgroundTint="#fef2f2"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="4dp"
-                android:text="HIGH"
-                android:textColor="#EB5757"
-                android:textSize="10sp"
-                android:textStyle="bold" />
-        </RelativeLayout>
-
+        <!-- Top row: severity badge + action buttons -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:layout_marginBottom="6dp">
 
+            <!-- Severity badge -->
             <TextView
-                android:id="@+id/tvModuleName"
+                android:id="@+id/tvSeverityBadge"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Authentication Engine estryuio"
-                android:ellipsize="end"
-                android:maxLines="2"
-                android:textColor="@color/on_surface_variant"
-                android:textSize="12sp" />
+                android:background="@drawable/bg_badge_pill"
+                android:backgroundTint="@color/primary_fixed_dim2"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="3dp"
+                android:text="HIGH"
+                android:textColor="@color/primary"
+                android:textSize="9sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.06"
+                tools:ignore="SmallSp"
+                android:gravity="center"
+                xmlns:tools="http://schemas.android.com/tools" />
 
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                />
+
+            <!-- Edit button -->
             <ImageView
                 android:id="@+id/ivEdit"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginEnd="16dp"
-                android:src="@drawable/ic_schedule"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_cloud_upload"
+                android:padding="3dp"
+                android:background="@drawable/bg_icon_btn_primary"
                 app:tint="@color/primary"
-                tools:ignore="ContentDescription" />
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_marginEnd="4dp"
+                android:contentDescription="Edit bug" />
 
+            <!-- Delete button -->
             <ImageView
                 android:id="@+id/ivDelete"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
                 android:src="@drawable/ic_schedule"
+                android:padding="3dp"
+                android:background="@drawable/bg_icon_btn_red"
                 app:tint="#EB5757"
-                tools:ignore="ContentDescription" />
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Delete bug" />
+
         </LinearLayout>
 
+        <!-- Bug title -->
+        <TextView
+            android:id="@+id/tvBugTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Untitled Bug"
+            android:textColor="@color/on_surface"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:minLines="2"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:lineSpacingMultiplier="1.2"
+            android:layout_marginBottom="3dp" />
+
+        <!-- Module name -->
+        <TextView
+            android:id="@+id/tvModuleName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="—"
+            android:textColor="@color/on_surface_variant"
+            android:textSize="10sp"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
     </LinearLayout>
-</com.google.android.material.card.MaterialCardView>
+
+</androidx.cardview.widget.CardView>
+
+
+<!--<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--    xmlns:tools="http://schemas.android.com/tools"-->
+<!--    android:layout_width="250dp"-->
+<!--    android:layout_height="wrap_content"-->
+<!--    android:layout_marginEnd="16dp"-->
+<!--    android:layout_marginBottom="8dp"-->
+<!--    app:cardCornerRadius="12dp"-->
+<!--    app:cardElevation="2dp"-->
+<!--    app:strokeWidth="1dp"-->
+<!--    app:strokeColor="#1A000000">-->
+
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="vertical"-->
+<!--        android:padding="16dp">-->
+
+<!--        <RelativeLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginBottom="12dp">-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/tvBugTitle"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_alignParentStart="true"-->
+<!--                android:layout_toStartOf="@+id/tvSeverityBadge"-->
+<!--                android:layout_marginEnd="12dp"-->
+<!--                android:text="UI layout shift on login"-->
+<!--                android:textColor="@color/on_surface"-->
+<!--                android:textSize="14sp"-->
+<!--                android:textStyle="bold"-->
+<!--                android:maxLines="1"-->
+<!--                android:ellipsize="end" />-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/tvSeverityBadge"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_alignParentEnd="true"-->
+<!--                android:background="@drawable/bg_badge_pill"-->
+<!--                android:backgroundTint="#fef2f2"-->
+<!--                android:paddingHorizontal="10dp"-->
+<!--                android:paddingVertical="4dp"-->
+<!--                android:text="HIGH"-->
+<!--                android:textColor="#EB5757"-->
+<!--                android:textSize="10sp"-->
+<!--                android:textStyle="bold" />-->
+<!--        </RelativeLayout>-->
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="horizontal"-->
+<!--            android:gravity="center_vertical">-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/tvModuleName"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_weight="1"-->
+<!--                android:text="Authentication Engine estryuio"-->
+<!--                android:ellipsize="end"-->
+<!--                android:maxLines="2"-->
+<!--                android:textColor="@color/on_surface_variant"-->
+<!--                android:textSize="12sp" />-->
+
+<!--            <ImageView-->
+<!--                android:id="@+id/ivEdit"-->
+<!--                android:layout_width="20dp"-->
+<!--                android:layout_height="20dp"-->
+<!--                android:layout_marginEnd="16dp"-->
+<!--                android:src="@drawable/ic_schedule"-->
+<!--                app:tint="@color/primary"-->
+<!--                tools:ignore="ContentDescription" />-->
+
+<!--            <ImageView-->
+<!--                android:id="@+id/ivDelete"-->
+<!--                android:layout_width="20dp"-->
+<!--                android:layout_height="20dp"-->
+<!--                android:src="@drawable/ic_schedule"-->
+<!--                app:tint="#EB5757"-->
+<!--                tools:ignore="ContentDescription" />-->
+<!--        </LinearLayout>-->
+
+<!--    </LinearLayout>-->
+<!--</com.google.android.material.card.MaterialCardView>-->

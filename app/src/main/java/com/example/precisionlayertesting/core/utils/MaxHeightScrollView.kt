@@ -8,7 +8,7 @@ import androidx.core.widget.NestedScrollView
 class MaxHeightScrollView : NestedScrollView {
 
     // Set to 200dp as per your original requirement
-    private val maxHeightDp = 100
+    private val maxHeightDp = 120
 
     // Explicit constructors for XML inflation
     constructor(context: Context) : super(context)

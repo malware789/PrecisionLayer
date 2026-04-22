@@ -1,414 +1,847 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="@color/surface">
 
+    <!-- ═══════════════════════════════════════════
+         HEADER / TOOLBAR  (gradient, Add Bug here)
+    ════════════════════════════════════════════ -->
+    <LinearLayout
+        android:id="@+id/layoutHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_header_gradient"
+        android:elevation="4dp">
+
+        <include
+            android:id="@+id/toolbar"
+            layout="@layout/toolbar_bug_form"
+            />
+
+        <!-- Bug chips recycler (horizontal) -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvAddedBugs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:clipToPadding="false"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="12dp"
+            android:visibility="gone"
+            tools:listitem="@layout/item_added_bug"
+            tools:visibility="visible" />
+
+        <!-- Progress bar -->
+        <ProgressBar
+            android:id="@+id/progressFormCompletion"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:max="4"
+            android:progress="0"
+            android:progressTint="@color/primary"
+            android:progressBackgroundTint="#33FFFFFF"
+            android:indeterminate="false" />
+
+    </LinearLayout>
+
+    <!-- ═══════════════════════════════════════════
+         SCROLLABLE FORM BODY
+    ════════════════════════════════════════════ -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true"
+        android:layout_height="0dp"
+        android:layout_above="@+id/layoutBottomBar"
+        android:layout_below="@+id/layoutHeader"
         android:clipToPadding="false"
-        android:paddingBottom="100dp"
-        >
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="24dp"
-            android:paddingTop="16dp"
-            android:paddingBottom="50dp">
+            android:paddingHorizontal="20dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="24dp">
 
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="10dp">
-
-<!--                <TextView-->
-<!--                    android:id="@+id/tvFormTitle"-->
-<!--                    android:layout_width="0dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_weight="1"-->
-<!--                    android:text="Bug Information"-->
-<!--                    android:textColor="@color/on_surface"-->
-<!--                    android:textSize="13sp"-->
-<!--                    android:textStyle="bold" />-->
-
-                <TextView
-                    android:id="@+id/tvBugCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_badge_pill"
-                    android:backgroundTint="@color/primary_fixed_dim2"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="6dp"
-                    android:text="0 Bugs"
-                    android:textColor="@color/primary"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-
-                    />
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"
-                    />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnAddAnotherBug"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="+ Add Bug"
-                    android:textAllCaps="false"
-                    android:textStyle="bold"
-                    android:paddingHorizontal="10dp"
-                    android:backgroundTint="@color/primary_fixed_dim2"
-                    />
-
-
-            </LinearLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvAddedBugs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                android:layout_marginBottom="10dp"
-                android:clipToPadding="false"
-                android:visibility="visible"
-                tools:listitem="@layout/item_added_bug"
-                />
-
-        </LinearLayout>
-
-
-
-<!--            <TextView-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="ACTIVE BUG ENTRY"-->
-<!--                android:textColor="@color/on_surface_variant"-->
-<!--                android:textSize="10sp"-->
-<!--                android:textStyle="bold"-->
-<!--                android:letterSpacing="0.1"-->
-<!--                android:layout_marginBottom="10dp" />-->
-
-            <!-- Module Dropdown -->
+            <!-- ── Module / Component (full width) ── -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Module/Component"
+                android:layout_marginBottom="6dp"
+                android:letterSpacing="0.04"
+                android:text="Module / Component"
                 android:textColor="@color/on_surface"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="5dp" />
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilComponent"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
+                android:layout_marginBottom="14dp"
+                app:boxCornerRadiusBottomEnd="10dp"
+                app:boxCornerRadiusBottomStart="10dp"
+                app:boxCornerRadiusTopEnd="10dp"
+                app:boxCornerRadiusTopStart="10dp"
+                app:boxStrokeColor="@color/primary"
                 app:hintEnabled="false">
+
                 <AutoCompleteTextView
                     android:id="@+id/atvComponent"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:padding="16dp"
                     android:inputType="none"
+                    android:padding="14dp"
+                    android:textColor="@color/on_surface"
                     android:textSize="14sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Bug Title -->
+            <!-- ── Priority (full width, below module) ── -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:text="Bug Title"
-                android:textColor="@color/on_surface"
-                android:textSize="13sp"
-                android:textStyle="bold" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/tilBugTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                app:hintEnabled="false">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etBugTitle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Briefly describe the issue..."
-                    android:textSize="14sp"
-                    android:padding="16dp"
-                    android:background="@drawable/bg_outline_ghost" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-
-            <!-- Priority Toggle -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:letterSpacing="0.04"
                 android:text="Priority"
                 android:textColor="@color/on_surface"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="5dp" />
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
             <com.google.android.material.button.MaterialButtonToggleGroup
                 android:id="@+id/togglePriority"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                app:singleSelection="true"
-                app:checkedButton="@+id/btnHigh">
+                android:layout_marginBottom="14dp"
+                app:checkedButton="@+id/btnLow"
+                app:singleSelection="true">
+
                 <Button
                     android:id="@+id/btnLow"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
                     android:layout_weight="1"
                     android:text="LOW"
-                    android:textSize="10sp" />
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+
                 <Button
                     android:id="@+id/btnMed"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
                     android:layout_weight="1"
                     android:text="MED"
-                    android:textSize="10sp" />
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+
                 <Button
                     android:id="@+id/btnHigh"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
                     android:layout_weight="1"
                     android:text="HIGH"
-                    android:textSize="10sp" />
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+
                 <Button
                     android:id="@+id/btnCrit"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
                     android:layout_weight="1"
                     android:text="CRIT"
-                    android:textSize="10sp" />
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
             </com.google.android.material.button.MaterialButtonToggleGroup>
 
-            <!-- Description -->
+            <!-- ── Bug Title ── -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:letterSpacing="0.04"
+                android:text="Bug Title"
+                android:textColor="@color/on_surface"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilBugTitle"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:boxCornerRadiusBottomEnd="10dp"
+                app:boxCornerRadiusBottomStart="10dp"
+                app:boxCornerRadiusTopEnd="10dp"
+                app:boxCornerRadiusTopStart="10dp"
+                app:boxStrokeColor="@color/primary"
+                app:hintEnabled="false">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etBugTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Briefly describe the issue..."
+                    android:padding="14dp"
+                    android:textSize="14sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- ── Description ── -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:letterSpacing="0.04"
                 android:text="Description"
                 android:textColor="@color/on_surface"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="5dp" />
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilDescription"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="15dp"
+                android:layout_marginBottom="14dp"
+                app:boxCornerRadiusBottomEnd="10dp"
+                app:boxCornerRadiusBottomStart="10dp"
+                app:boxCornerRadiusTopEnd="10dp"
+                app:boxCornerRadiusTopStart="10dp"
+                app:boxStrokeColor="@color/primary"
                 app:hintEnabled="false">
+
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minLines="4"
                     android:gravity="top"
                     android:hint="Provide a detailed overview of the unexpected behavior..."
-                    android:textSize="14sp"
-                    android:padding="16dp"
-                    android:background="@drawable/bg_outline_ghost" />
+                    android:minLines="3"
+                    android:padding="14dp"
+                    android:textSize="14sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Steps Section -->
-            <TextView
-                android:layout_width="wrap_content"
+            <!-- ── Steps to Reproduce ── -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Steps to Reproduce"
-                android:textColor="@color/on_surface"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="5dp" />
+                android:layout_marginBottom="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:letterSpacing="0.04"
+                    android:text="Steps to Reproduce"
+                    android:textColor="@color/on_surface"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAddStep"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:backgroundTint="@color/primary_fixed_dim2"
+                    android:paddingHorizontal="12dp"
+                    android:text="+ Add Step"
+                    android:textAllCaps="false"
+                    android:textColor="@color/primary"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Steps scroll container with max height -->
             <com.example.precisionlayertesting.core.utils.MaxHeightScrollView
                 android:id="@+id/stepScrollView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                android:background="@drawable/bg_steps_container"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="7dp"
+
                 >
 
                 <LinearLayout
                     android:id="@+id/llStepsContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <!-- Step 1 example -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="8dp">
-                        <TextView
-                            android:layout_width="24dp"
-                            android:layout_height="wrap_content"
-                            android:text="1."
-                            android:textColor="@color/primary"
-                            android:textStyle="bold" />
-                        <EditText
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Navigate to Login screen"
-                            android:background="@null"
-                            android:textSize="13sp" />
-                    </LinearLayout>
+                    android:orientation="vertical"/>
 
-                </LinearLayout>
+
             </com.example.precisionlayertesting.core.utils.MaxHeightScrollView>
 
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnAddStep"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="+ Add Step"
-                android:textAllCaps="false"
-                android:textColor="@color/primary"
-                android:layout_marginBottom="15dp" />
-
-            <!-- Attachment Area -->
+            <!-- ── Screenshots & Evidence ── -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:letterSpacing="0.04"
                 android:text="Screenshots &amp; Evidence"
                 android:textColor="@color/on_surface"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="5dp" />
+                android:textSize="12sp"
+                android:textStyle="bold" />
 
             <FrameLayout
                 android:id="@+id/attachmentArea"
                 android:layout_width="match_parent"
-                android:layout_height="120dp"
+                android:layout_height="110dp"
+                android:layout_marginBottom="6dp"
                 android:background="@drawable/bg_dashed_border"
                 android:clickable="true"
-                android:focusable="true"
+                android:focusable="true">
 
-                >
-
+                <!-- Placeholder (upload prompt) -->
                 <LinearLayout
                     android:id="@+id/attachmentPlaceholder"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center"
-                    android:orientation="horizontal"
+                    android:orientation="vertical">
 
-                    >
                     <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_schedule"
-                        app:tint="@color/outline" />
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_marginBottom="6dp"
+                        android:src="@drawable/ic_attach_file"
+                        app:tint="@color/primary" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="ATTACH SCREENSHOT"
-                        android:textColor="@color/on_surface_variant"
-                        android:textSize="12sp"
+                        android:letterSpacing="0.06"
+                        android:text="TAP TO ATTACH SCREENSHOT"
+                        android:textColor="@color/primary"
+                        android:textSize="11sp"
                         android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="PNG, JPG supported"
+                        android:textColor="@color/on_surface_variant"
+                        android:textSize="10sp" />
                 </LinearLayout>
 
+                <!-- Screenshot preview -->
                 <ImageView
                     android:id="@+id/ivScreenshotPreview"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
-                    android:visibility="gone"
+                    android:visibility="gone" />
 
-                    />
-
+                <!-- Upload progress -->
                 <ProgressBar
                     android:id="@+id/pbAttachmentUpload"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:layout_gravity="center"
+                    android:indeterminateTint="@color/primary"
                     android:visibility="gone" />
 
+                <!-- Delete screenshot button -->
                 <ImageView
                     android:id="@+id/ivDeleteScreenshot"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_gravity="top|end"
                     android:layout_margin="8dp"
-                    android:padding="6dp"
-                    android:src="@drawable/ic_schedule"
                     android:background="@drawable/bg_circle_white"
                     android:elevation="4dp"
-                    app:tint="#EB5757"
-                    android:visibility="gone" />
-            </FrameLayout>
+                    android:padding="5dp"
+                    android:src="@drawable/ic_schedule"
+                    android:visibility="gone"
+                    app:tint="#EB5757" />
 
+            </FrameLayout>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Bottom Bar -->
+    <!-- ═══════════════════════════════════════════
+         BOTTOM BAR  (Cancel + Submit)
+    ════════════════════════════════════════════ -->
     <LinearLayout
+        android:id="@+id/layoutBottomBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_gravity="bottom"
-        android:paddingHorizontal="24dp"
-        android:background="@color/surface">
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="14dp"
+        android:background="@color/surface"
+        android:elevation="8dp"
+        android:layout_alignParentBottom="true"
+        >
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCancel"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
-            android:layout_height="56dp"
+            android:layout_height="52dp"
             android:layout_weight="1"
             android:text="Cancel"
             android:textAllCaps="false"
-            app:cornerRadius="16dp"
+            android:textStyle="bold"
+            app:strokeColor="@color/primary"
+            app:cornerRadius="14dp"
+            android:textColor="@color/primary"
             android:backgroundTint="@color/primary_fixed_dim2"
+
             />
 
         <Space
-            android:layout_width="16dp"
+            android:layout_width="12dp"
             android:layout_height="wrap_content" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSubmitAll"
             android:layout_width="0dp"
-            android:layout_height="56dp"
-            android:layout_weight="1"
+            android:layout_height="52dp"
+            android:layout_weight="2"
             android:text="Submit Bugs"
             android:textAllCaps="false"
-            app:cornerRadius="16dp"
-            app:backgroundTint="@color/primary" />
+            android:textStyle="bold"
+            android:textSize="14sp"
+            app:cornerRadius="14dp"
+            app:backgroundTint="@color/primary"
+            android:textColor="#FFFFFF" />
+
     </LinearLayout>
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</RelativeLayout>
+
+<!--<androidx.coordinatorlayout.widget.CoordinatorLayout-->
+<!--    xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--    xmlns:tools="http://schemas.android.com/tools"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="match_parent"-->
+<!--    android:background="@color/surface">-->
+
+<!--    <androidx.core.widget.NestedScrollView-->
+<!--        android:id="@+id/nestedScrollView"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:fillViewport="true"-->
+<!--        android:clipToPadding="false"-->
+<!--        android:paddingBottom="100dp"-->
+<!--        >-->
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="vertical"-->
+<!--            android:paddingHorizontal="24dp"-->
+<!--            android:paddingTop="16dp"-->
+<!--            android:paddingBottom="50dp">-->
+
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="vertical">-->
+
+
+<!--            <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:orientation="horizontal"-->
+<!--                android:gravity="center_vertical"-->
+<!--                android:layout_marginBottom="10dp">-->
+
+<!--&lt;!&ndash;                <TextView&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:id="@+id/tvFormTitle"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:layout_width="0dp"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:layout_height="wrap_content"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:layout_weight="1"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:text="Bug Information"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:textColor="@color/on_surface"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:textSize="13sp"&ndash;&gt;-->
+<!--&lt;!&ndash;                    android:textStyle="bold" />&ndash;&gt;-->
+
+<!--                <TextView-->
+<!--                    android:id="@+id/tvBugCount"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:background="@drawable/bg_badge_pill"-->
+<!--                    android:backgroundTint="@color/primary_fixed_dim2"-->
+<!--                    android:paddingHorizontal="12dp"-->
+<!--                    android:paddingVertical="6dp"-->
+<!--                    android:text="0 Bugs"-->
+<!--                    android:textColor="@color/primary"-->
+<!--                    android:textSize="12sp"-->
+<!--                    android:textStyle="bold"-->
+
+<!--                    />-->
+
+<!--                <View-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="0dp"-->
+<!--                    android:layout_weight="1"-->
+<!--                    />-->
+
+<!--                <com.google.android.material.button.MaterialButton-->
+<!--                    android:id="@+id/btnAddAnotherBug"-->
+<!--                    style="@style/Widget.MaterialComponents.Button.TextButton"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="+ Add Bug"-->
+<!--                    android:textAllCaps="false"-->
+<!--                    android:textStyle="bold"-->
+<!--                    android:paddingHorizontal="10dp"-->
+<!--                    android:backgroundTint="@color/primary_fixed_dim2"-->
+<!--                    />-->
+
+
+<!--            </LinearLayout>-->
+
+<!--            <androidx.recyclerview.widget.RecyclerView-->
+<!--                android:id="@+id/rvAddedBugs"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:orientation="horizontal"-->
+<!--                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"-->
+<!--                android:layout_marginBottom="10dp"-->
+<!--                android:clipToPadding="false"-->
+<!--                android:visibility="visible"-->
+<!--                tools:listitem="@layout/item_added_bug"-->
+<!--                />-->
+
+<!--        </LinearLayout>-->
+
+
+
+<!--&lt;!&ndash;            <TextView&ndash;&gt;-->
+<!--&lt;!&ndash;                android:layout_width="wrap_content"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:layout_height="wrap_content"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:text="ACTIVE BUG ENTRY"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:textColor="@color/on_surface_variant"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:textSize="10sp"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:textStyle="bold"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:letterSpacing="0.1"&ndash;&gt;-->
+<!--&lt;!&ndash;                android:layout_marginBottom="10dp" />&ndash;&gt;-->
+
+<!--            &lt;!&ndash; Module Dropdown &ndash;&gt;-->
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Module/Component"-->
+<!--                android:textColor="@color/on_surface"-->
+<!--                android:textSize="13sp"-->
+<!--                android:textStyle="bold"-->
+<!--                android:layout_marginBottom="5dp" />-->
+
+<!--            <com.google.android.material.textfield.TextInputLayout-->
+<!--                android:id="@+id/tilComponent"-->
+<!--                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginBottom="10dp"-->
+<!--                app:hintEnabled="false">-->
+<!--                <AutoCompleteTextView-->
+<!--                    android:id="@+id/atvComponent"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:padding="16dp"-->
+<!--                    android:inputType="none"-->
+<!--                    android:textSize="14sp" />-->
+<!--            </com.google.android.material.textfield.TextInputLayout>-->
+
+<!--            &lt;!&ndash; Bug Title &ndash;&gt;-->
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginBottom="5dp"-->
+<!--                android:text="Bug Title"-->
+<!--                android:textColor="@color/on_surface"-->
+<!--                android:textSize="13sp"-->
+<!--                android:textStyle="bold" />-->
+
+<!--            <com.google.android.material.textfield.TextInputLayout-->
+<!--                android:id="@+id/tilBugTitle"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginBottom="10dp"-->
+<!--                app:hintEnabled="false">-->
+<!--                <com.google.android.material.textfield.TextInputEditText-->
+<!--                    android:id="@+id/etBugTitle"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:hint="Briefly describe the issue..."-->
+<!--                    android:textSize="14sp"-->
+<!--                    android:padding="16dp"-->
+<!--                    android:background="@drawable/bg_outline_ghost" />-->
+<!--            </com.google.android.material.textfield.TextInputLayout>-->
+
+
+<!--            &lt;!&ndash; Priority Toggle &ndash;&gt;-->
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Priority"-->
+<!--                android:textColor="@color/on_surface"-->
+<!--                android:textSize="13sp"-->
+<!--                android:textStyle="bold"-->
+<!--                android:layout_marginBottom="5dp" />-->
+
+<!--            <com.google.android.material.button.MaterialButtonToggleGroup-->
+<!--                android:id="@+id/togglePriority"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginBottom="10dp"-->
+<!--                app:singleSelection="true"-->
+<!--                app:checkedButton="@+id/btnHigh">-->
+<!--                <Button-->
+<!--                    android:id="@+id/btnLow"-->
+<!--                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:text="LOW"-->
+<!--                    android:textSize="10sp" />-->
+<!--                <Button-->
+<!--                    android:id="@+id/btnMed"-->
+<!--                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:text="MED"-->
+<!--                    android:textSize="10sp" />-->
+<!--                <Button-->
+<!--                    android:id="@+id/btnHigh"-->
+<!--                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:text="HIGH"-->
+<!--                    android:textSize="10sp" />-->
+<!--                <Button-->
+<!--                    android:id="@+id/btnCrit"-->
+<!--                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_weight="1"-->
+<!--                    android:text="CRIT"-->
+<!--                    android:textSize="10sp" />-->
+<!--            </com.google.android.material.button.MaterialButtonToggleGroup>-->
+
+<!--            &lt;!&ndash; Description &ndash;&gt;-->
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Description"-->
+<!--                android:textColor="@color/on_surface"-->
+<!--                android:textSize="13sp"-->
+<!--                android:textStyle="bold"-->
+<!--                android:layout_marginBottom="5dp" />-->
+
+<!--            <com.google.android.material.textfield.TextInputLayout-->
+<!--                android:id="@+id/tilDescription"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginBottom="15dp"-->
+<!--                app:hintEnabled="false">-->
+<!--                <com.google.android.material.textfield.TextInputEditText-->
+<!--                    android:id="@+id/etDescription"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:minLines="4"-->
+<!--                    android:gravity="top"-->
+<!--                    android:hint="Provide a detailed overview of the unexpected behavior..."-->
+<!--                    android:textSize="14sp"-->
+<!--                    android:padding="16dp"-->
+<!--                    android:background="@drawable/bg_outline_ghost" />-->
+<!--            </com.google.android.material.textfield.TextInputLayout>-->
+
+<!--            &lt;!&ndash; Steps Section &ndash;&gt;-->
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Steps to Reproduce"-->
+<!--                android:textColor="@color/on_surface"-->
+<!--                android:textSize="13sp"-->
+<!--                android:textStyle="bold"-->
+<!--                android:layout_marginBottom="5dp" />-->
+
+<!--            <com.example.precisionlayertesting.core.utils.MaxHeightScrollView-->
+<!--                android:id="@+id/stepScrollView"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                >-->
+
+<!--                <LinearLayout-->
+<!--                    android:id="@+id/llStepsContainer"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:orientation="vertical">-->
+<!--                    &lt;!&ndash; Step 1 example &ndash;&gt;-->
+<!--                    <LinearLayout-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:orientation="horizontal"-->
+<!--                        android:gravity="center_vertical"-->
+<!--                        android:layout_marginBottom="8dp">-->
+<!--                        <TextView-->
+<!--                            android:layout_width="24dp"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="1."-->
+<!--                            android:textColor="@color/primary"-->
+<!--                            android:textStyle="bold" />-->
+<!--                        <EditText-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="Navigate to Login screen"-->
+<!--                            android:background="@null"-->
+<!--                            android:textSize="13sp" />-->
+<!--                    </LinearLayout>-->
+
+<!--                </LinearLayout>-->
+<!--            </com.example.precisionlayertesting.core.utils.MaxHeightScrollView>-->
+
+
+<!--            <com.google.android.material.button.MaterialButton-->
+<!--                android:id="@+id/btnAddStep"-->
+<!--                style="@style/Widget.MaterialComponents.Button.TextButton"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="+ Add Step"-->
+<!--                android:textAllCaps="false"-->
+<!--                android:textColor="@color/primary"-->
+<!--                android:layout_marginBottom="15dp" />-->
+
+<!--            &lt;!&ndash; Attachment Area &ndash;&gt;-->
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Screenshots &amp; Evidence"-->
+<!--                android:textColor="@color/on_surface"-->
+<!--                android:textSize="13sp"-->
+<!--                android:textStyle="bold"-->
+<!--                android:layout_marginBottom="5dp" />-->
+
+<!--            <FrameLayout-->
+<!--                android:id="@+id/attachmentArea"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="120dp"-->
+<!--                android:background="@drawable/bg_dashed_border"-->
+<!--                android:clickable="true"-->
+<!--                android:focusable="true"-->
+
+<!--                >-->
+
+<!--                <LinearLayout-->
+<!--                    android:id="@+id/attachmentPlaceholder"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:gravity="center"-->
+<!--                    android:orientation="horizontal"-->
+
+<!--                    >-->
+<!--                    <ImageView-->
+<!--                        android:layout_width="24dp"-->
+<!--                        android:layout_height="24dp"-->
+<!--                        android:src="@drawable/ic_schedule"-->
+<!--                        app:tint="@color/outline" />-->
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginStart="8dp"-->
+<!--                        android:text="ATTACH SCREENSHOT"-->
+<!--                        android:textColor="@color/on_surface_variant"-->
+<!--                        android:textSize="12sp"-->
+<!--                        android:textStyle="bold" />-->
+<!--                </LinearLayout>-->
+
+<!--                <ImageView-->
+<!--                    android:id="@+id/ivScreenshotPreview"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="match_parent"-->
+<!--                    android:scaleType="centerCrop"-->
+<!--                    android:visibility="gone"-->
+
+<!--                    />-->
+
+<!--                <ProgressBar-->
+<!--                    android:id="@+id/pbAttachmentUpload"-->
+<!--                    android:layout_width="32dp"-->
+<!--                    android:layout_height="32dp"-->
+<!--                    android:layout_gravity="center"-->
+<!--                    android:visibility="gone" />-->
+
+<!--                <ImageView-->
+<!--                    android:id="@+id/ivDeleteScreenshot"-->
+<!--                    android:layout_width="32dp"-->
+<!--                    android:layout_height="32dp"-->
+<!--                    android:layout_gravity="top|end"-->
+<!--                    android:layout_margin="8dp"-->
+<!--                    android:padding="6dp"-->
+<!--                    android:src="@drawable/ic_schedule"-->
+<!--                    android:background="@drawable/bg_circle_white"-->
+<!--                    android:elevation="4dp"-->
+<!--                    app:tint="#EB5757"-->
+<!--                    android:visibility="gone" />-->
+<!--            </FrameLayout>-->
+
+
+<!--        </LinearLayout>-->
+<!--    </androidx.core.widget.NestedScrollView>-->
+
+<!--    &lt;!&ndash; Bottom Bar &ndash;&gt;-->
+<!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:layout_gravity="bottom"-->
+<!--        android:paddingHorizontal="24dp"-->
+<!--        android:background="@color/surface">-->
+
+<!--        <com.google.android.material.button.MaterialButton-->
+<!--            android:id="@+id/btnCancel"-->
+<!--            style="@style/Widget.MaterialComponents.Button.OutlinedButton"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="56dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:text="Cancel"-->
+<!--            android:textAllCaps="false"-->
+<!--            app:cornerRadius="16dp"-->
+<!--            android:backgroundTint="@color/primary_fixed_dim2"-->
+<!--            />-->
+
+<!--        <Space-->
+<!--            android:layout_width="16dp"-->
+<!--            android:layout_height="wrap_content" />-->
+
+<!--        <com.google.android.material.button.MaterialButton-->
+<!--            android:id="@+id/btnSubmitAll"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="56dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:text="Submit Bugs"-->
+<!--            android:textAllCaps="false"-->
+<!--            app:cornerRadius="16dp"-->
+<!--            app:backgroundTint="@color/primary" />-->
+<!--    </LinearLayout>-->
+
+<!--</androidx.coordinatorlayout.widget.CoordinatorLayout>-->

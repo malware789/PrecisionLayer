@@ -57,15 +57,22 @@ class ReportBugFormFragment : Fragment() {
 
     private var selectedScreenshotUri: Uri? = null
     private var editingDraftIndex: Int? = null
-    private val stepViews = mutableListOf<EditText>()
+
+    // Tracks each step row's EditText AND its delete ImageView
+    private data class StepRow(val editText: EditText, val deleteIcon: ImageView)
+    private val stepRows = mutableListOf<StepRow>()
+
+    // Convenience accessor kept for legacy helpers that used stepViews
+    private val stepViews: List<EditText> get() = stepRows.map { it.editText }
 
     private val addedBugsAdapter = AddedBugsAdapter()
 
     private var lastBackPressedTime: Long = 0L
 
-    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let { viewModel.onScreenshotSelected(requireContext(), it) }
-    }
+    private val pickImageLauncher =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let { viewModel.onScreenshotSelected(requireContext(), it) }
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -75,56 +82,39 @@ class ReportBugFormFragment : Fragment() {
         return binding.root
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setupRecyclerView()
         setupUI()
         observeViewModel()
         setupBackPressHandling()
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // Back press
+    // ─────────────────────────────────────────────────────────────────────────
     private fun setupBackPressHandling() {
-//        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
-//           override fun handleOnBackPressed() {
-//                val hasDrafts = viewModel.draftBugs.value?.isNotEmpty() == true
-//                val hasText = !binding.etBugTitle.text.isNullOrBlank() || !binding.etDescription.text.isNullOrBlank()
-//
-//                if (hasDrafts || hasText) {
-//                    if (System.currentTimeMillis() - lastBackPressedTime < 2000) {
-//                        isEnabled = false
-//                        requireActivity().onBackPressed()
-//                    } else {
-//                        lastBackPressedTime = System.currentTimeMillis()
-//                        Toast.makeText(requireContext(), "Press back again to exit and lose unsaved data", Toast.LENGTH_SHORT).show()
-//                    }
-//                } else {
-//                    isEnabled = false
-//                    requireActivity().onBackPressed()
-//                }
-//            }
-//        })
-
-
-        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner){
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             if (System.currentTimeMillis() - lastBackPressedTime < 2000) {
                 findNavController().popBackStack()
-            }
-            else {
+            } else {
                 lastBackPressedTime = System.currentTimeMillis()
                 Toast.makeText(requireContext(), "Press back again to exit", Toast.LENGTH_SHORT).show()
             }
         }
-
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // RecyclerView
+    // ─────────────────────────────────────────────────────────────────────────
     private fun setupRecyclerView() {
         binding.rvAddedBugs.apply {
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
             adapter = addedBugsAdapter
         }
-        addedBugsAdapter.onDeleteItem = { index -> 
+
+        // Delete chip
+        addedBugsAdapter.onDeleteItem = { index ->
             com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Remove Bug Draft?")
                 .setMessage("Are you sure you want to remove this bug draft?")
@@ -135,34 +125,39 @@ class ReportBugFormFragment : Fragment() {
                 .setNegativeButton("Cancel", null)
                 .show()
         }
-        addedBugsAdapter.onEditItem = { index -> 
+
+        // Edit chip — wired here (was already implemented in ViewModel/Fragment, adapter just needed the callback)
+        addedBugsAdapter.onEditItem = { index ->
             loadForEdit(index)
         }
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // Load a draft into the form for editing
+    // ─────────────────────────────────────────────────────────────────────────
     private fun loadForEdit(index: Int) {
         val draft = viewModel.draftBugs.value?.getOrNull(index) ?: return
         editingDraftIndex = index
-        
+
         binding.etBugTitle.setText(draft.title)
         binding.etDescription.setText(draft.description)
-        
+
         if (binding.atvComponent.isEnabled) {
             binding.atvComponent.setText(draft.component, false)
         }
 
-        // Set priority
+        // Priority
         val priorityId = when (draft.severity) {
-            BugReport.SEVERITY_LOW -> R.id.btnLow
-            BugReport.SEVERITY_MEDIUM -> R.id.btnMed
+            BugReport.SEVERITY_LOW      -> R.id.btnLow
+            BugReport.SEVERITY_MEDIUM   -> R.id.btnMed
             BugReport.SEVERITY_CRITICAL -> R.id.btnCrit
-            else -> R.id.btnHigh
+            else                        -> R.id.btnHigh
         }
         binding.togglePriority.check(priorityId)
 
-        // Load steps
+        // Steps
         binding.llStepsContainer.removeAllViews()
-        stepViews.clear()
+        stepRows.clear()
         val steps = draft.steps?.split("\n") ?: emptyList()
         if (steps.isEmpty()) {
             addStepRow(binding.llStepsContainer, 1)
@@ -172,32 +167,36 @@ class ReportBugFormFragment : Fragment() {
                 addRowWithText(binding.llStepsContainer, i + 1, pureText)
             }
         }
+        refreshStepDeleteIcons()
 
-        // Pre-fill attachment state in ViewModel for editing (so user can see/replace it)
+        // Restore attachment
         viewModel.restoreAttachmentForEdit(draft.cachedUri, draft.mimeType)
-        
-        binding.btnAddAnotherBug.text = "Update Bug"
-//        binding.tvFormTitle.text = "Edit Bug Draft"
-        
-        // Scroll to top to see edit form
+
+        binding.toolbar.btnAddAnotherBug.text = "Update Bug"
+        updateProgressBar()
+
+        // Scroll to top so user sees the form
         binding.nestedScrollView.smoothScrollTo(0, 0)
     }
 
     private fun addRowWithText(container: LinearLayout, stepNumber: Int, text: String) {
         addStepRow(container, stepNumber)
-        stepViews.lastOrNull()?.setText(text)
+        stepRows.lastOrNull()?.editText?.setText(text)
     }
 
     private fun cancelEdit() {
         editingDraftIndex = null
         resetForm()
         viewModel.clearAttachment()
-        binding.btnAddAnotherBug.text = "+ Add Bug"
-//        binding.tvFormTitle.text = "Bug Information"
+        binding.toolbar.btnAddAnotherBug.text = "+ Add Bug"
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // UI setup
+    // ─────────────────────────────────────────────────────────────────────────
     private fun setupUI() {
-        // --- Component Autocomplete ---
+
+        // Component autocomplete
         viewModel.modules.observe(viewLifecycleOwner) { modules ->
             val names = modules.map { it.name }
             val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, names)
@@ -207,32 +206,30 @@ class ReportBugFormFragment : Fragment() {
             }
         }
 
-        // --- Pre-populate component from nav args and lock if necessary ---
+        // Lock component if pre-filled from nav args
         if (args.moduleName.isNotBlank()) {
             binding.atvComponent.setText(args.moduleName, false)
             binding.atvComponent.isEnabled = false
             binding.tilComponent.isEnabled = false
-            // Optional: visual cue that it's read-only
             binding.tilComponent.helperText = "Fixed for this session"
         }
 
-        // --- Steps: wire up initial step view ---
-        val stepsContainer = binding.llStepsContainer
-        // Clear template step inflated from XML and manage dynamically
-        stepsContainer.removeAllViews()
-        addStepRow(stepsContainer, 1)
+        // Steps — clear XML placeholder, add first row dynamically
+        binding.llStepsContainer.removeAllViews()
+        addStepRow(binding.llStepsContainer, 1)
 
         binding.btnAddStep.setOnClickListener {
-            addStepRow(stepsContainer, stepViews.size + 1)
+            addStepRow(binding.llStepsContainer, stepRows.size + 1)
+            refreshStepDeleteIcons()
         }
 
-        // --- Attachment area ---
+        // Attachment
         binding.attachmentPlaceholder.setOnClickListener {
             pickImageLauncher.launch("image/*")
         }
 
-        // --- Add Another/Update Bug ---
-        binding.btnAddAnotherBug.setOnClickListener {
+        // Add / Update bug
+        binding.toolbar.btnAddAnotherBug.setOnClickListener {
             if (validateForm()) {
                 val priority = getSelectedSeverity()
                 val stepsText = getStepsString()
@@ -240,11 +237,11 @@ class ReportBugFormFragment : Fragment() {
                 if (editingDraftIndex != null) {
                     viewModel.updateDraftAt(
                         editingDraftIndex!!,
-                        title = binding.etBugTitle.text.toString().trim(),
-                        component = binding.atvComponent.text.toString().trim(),
-                        severity = priority,
+                        title       = binding.etBugTitle.text.toString().trim(),
+                        component   = binding.atvComponent.text.toString().trim(),
+                        severity    = priority,
                         description = binding.etDescription.text.toString().trim(),
-                        steps = stepsText.ifBlank { null }
+                        steps       = stepsText.ifBlank { null }
                     )
                     cancelEdit()
                     Snackbar.make(binding.root, "✓ Draft updated", Snackbar.LENGTH_SHORT).show()
@@ -256,9 +253,9 @@ class ReportBugFormFragment : Fragment() {
             }
         }
 
-        // --- Submit All Bugs ---
+        // Submit all
         binding.btnSubmitAll.setOnClickListener {
-            val hasDrafts = viewModel.draftBugs.value?.isNotEmpty() == true
+            val hasDrafts       = viewModel.draftBugs.value?.isNotEmpty() == true
             val currentFormValid = validateForm(showErrors = false)
 
             if (!hasDrafts && !currentFormValid) {
@@ -267,33 +264,29 @@ class ReportBugFormFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            // Correct count logic: 
-            // If editing, the form bug is already one of the drafts.
-            // If NOT editing and form is valid, it's an extra bug (+1).
             val draftsCount = viewModel.draftBugs.value?.size ?: 0
-            val isEditing = editingDraftIndex != null
-            val count = if (isEditing || !currentFormValid) draftsCount else draftsCount + 1
-            
+            val isEditing   = editingDraftIndex != null
+            val count       = if (isEditing || !currentFormValid) draftsCount else draftsCount + 1
+
             com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Submit Bug Reports")
                 .setMessage("You are about to submit $count bug report(s). Continue?")
                 .setPositiveButton("Submit") { _, _ ->
                     val finalBug = if (currentFormValid) {
                         val currentDrafts = viewModel.draftBugs.value.orEmpty()
-                        val existingId = if (isEditing) currentDrafts.getOrNull(editingDraftIndex!!)?.id else null
-                        
+                        val existingId    = if (isEditing) currentDrafts.getOrNull(editingDraftIndex!!)?.id else null
                         BugDraft(
-                            id = existingId ?: UUID.randomUUID().toString(),
-                            title = binding.etBugTitle.text.toString().trim(),
-                            component = binding.atvComponent.text.toString().trim(),
-                            severity = getSelectedSeverity(),
+                            id          = existingId ?: UUID.randomUUID().toString(),
+                            title       = binding.etBugTitle.text.toString().trim(),
+                            component   = binding.atvComponent.text.toString().trim(),
+                            severity    = getSelectedSeverity(),
                             description = binding.etDescription.text.toString().trim(),
-                            steps = getStepsString().ifBlank { null },
-                            cachedUri = viewModel.currentCachedUri.value,
-                            mimeType = viewModel.currentMimeType.value
+                            steps       = getStepsString().ifBlank { null },
+                            cachedUri   = viewModel.currentCachedUri.value,
+                            mimeType    = viewModel.currentMimeType.value
                         )
                     } else null
-                    
+
                     val userId = ManualDI.prefsManager.getUserId() ?: ""
                     viewModel.submitAllBugs(requireContext(), userId, args.sessionId, finalBug)
                 }
@@ -301,12 +294,12 @@ class ReportBugFormFragment : Fragment() {
                 .show()
         }
 
-        // --- Cancel ---
+        // Cancel
         binding.btnCancel.setOnClickListener {
             if (editingDraftIndex != null) {
                 cancelEdit()
             } else if (viewModel.draftBugs.value?.isNotEmpty() == true) {
-                  com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+                com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
                     .setTitle("Discard Session?")
                     .setMessage("You have unsaved drafts. Are you sure you want to leave?")
                     .setPositiveButton("Discard & Exit") { _, _ -> findNavController().popBackStack() }
@@ -316,54 +309,102 @@ class ReportBugFormFragment : Fragment() {
                 findNavController().popBackStack()
             }
         }
+
+        // Text watchers for live progress bar update
+        listOf(binding.etBugTitle, binding.etDescription).forEach { et ->
+            et.addTextChangedListener(object : android.text.TextWatcher {
+                override fun afterTextChanged(s: android.text.Editable?) = updateProgressBar()
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+            })
+        }
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // Step rows
+    // ─────────────────────────────────────────────────────────────────────────
     private fun addStepRow(container: LinearLayout, stepNumber: Int) {
         val row = LayoutInflater.from(requireContext())
             .inflate(R.layout.item_step_row, container, false) as LinearLayout
 
-        val numberLabel = row.getChildAt(0) as TextView
-        val editText = row.getChildAt(1) as EditText
+        val numberLabel = row.findViewById<TextView>(R.id.tvStepNumber)
+        val editText    = row.findViewById<EditText>(R.id.etStep)
+        val deleteIcon  = row.findViewById<ImageView>(R.id.ivDeleteStep)
 
         numberLabel.text = "$stepNumber."
-        editText.hint = "Step $stepNumber..."
-        editText.text = null
+        editText.hint    = "Step $stepNumber..."
+        editText.text    = null
+
+        deleteIcon.setOnClickListener {
+            val idx = stepRows.indexOfFirst { it.editText == editText }
+            if (idx != -1) {
+                stepRows.removeAt(idx)
+                container.removeView(row)
+                // Renumber remaining rows
+                stepRows.forEachIndexed { i, sr ->
+                    (sr.editText.parent as? LinearLayout)
+                        ?.findViewById<TextView>(R.id.tvStepNumber)
+                        ?.text = "${i + 1}."
+                    sr.editText.hint = "Step ${i + 1}..."
+                }
+                refreshStepDeleteIcons()
+            }
+        }
 
         container.addView(row)
-        stepViews.add(editText)
+        stepRows.add(StepRow(editText, deleteIcon))
     }
 
+    /** Show delete icon only when there are 2+ steps */
+    private fun refreshStepDeleteIcons() {
+        val show = stepRows.size > 1
+        stepRows.forEach { it.deleteIcon.visibility = if (show) View.VISIBLE else View.GONE }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Progress bar (0-4 based on filled fields)
+    // ─────────────────────────────────────────────────────────────────────────
+    private fun updateProgressBar() {
+        var progress = 0
+        if (!binding.etBugTitle.text.isNullOrBlank())   progress++
+        if (!binding.atvComponent.text.isNullOrBlank()) progress++
+        if (!binding.etDescription.text.isNullOrBlank()) progress++
+        if (stepRows.any { !it.editText.text.isNullOrBlank() }) progress++
+        binding.progressFormCompletion.progress = progress
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Observers
+    // ─────────────────────────────────────────────────────────────────────────
     private fun observeViewModel() {
+
         viewModel.draftBugs.observe(viewLifecycleOwner) { drafts ->
             addedBugsAdapter.submitList(drafts.toList())
-            binding.rvAddedBugs.visibility = if (drafts.isEmpty()) View.GONE else View.VISIBLE
-            
-            // Update counter
-            binding.tvBugCount.text = "${drafts.size} Bug${if (drafts.size == 1) "" else "s"}"
-            binding.tvBugCount.visibility = if (drafts.isEmpty()) View.GONE else View.VISIBLE
 
+            val hasDrafts = drafts.isNotEmpty()
+            binding.rvAddedBugs.visibility  = if (hasDrafts) View.VISIBLE else View.GONE
+            binding.toolbar.tvBugCount.text         = "${drafts.size} Bug${if (drafts.size == 1) "" else "s"}"
+            binding.toolbar.tvBugCount.visibility   = if (hasDrafts) View.VISIBLE else View.GONE
         }
 
         viewModel.isCurrentAttachmentUploading.observe(viewLifecycleOwner) { isUploading ->
-            binding.btnAddAnotherBug.isEnabled = !isUploading
-            binding.attachmentArea.alpha = if (isUploading) 0.5f else 1.0f
-            binding.pbAttachmentUpload.visibility = if (isUploading) View.VISIBLE else View.GONE
-            
+            binding.toolbar.btnAddAnotherBug.isEnabled      = !isUploading
+            binding.attachmentArea.alpha            = if (isUploading) 0.5f else 1.0f
+            binding.pbAttachmentUpload.visibility   = if (isUploading) View.VISIBLE else View.GONE
+
             if (isUploading) {
-                binding.btnAddAnotherBug.text = "Processing Image..."
+                binding.toolbar.btnAddAnotherBug.text           = "Processing Image..."
                 binding.attachmentPlaceholder.isClickable = false
-            }
-            else {
-                binding.btnAddAnotherBug.text = if (editingDraftIndex != null) "Update Bug" else "+ Add Bug"
+            } else {
+                binding.toolbar.btnAddAnotherBug.text           =
+                    if (editingDraftIndex != null) "Update Bug" else "+ Add Bug"
                 binding.attachmentPlaceholder.isClickable = true
             }
         }
 
         viewModel.submissionState.observe(viewLifecycleOwner) { state ->
             when (state) {
-                is ReportBugViewModel.SubmissionState.Submitting -> {
-                    setLoading(true)
-                }
+                is ReportBugViewModel.SubmissionState.Submitting -> setLoading(true)
                 is ReportBugViewModel.SubmissionState.Success -> {
                     setLoading(false)
                     Toast.makeText(requireContext(), "✓ All bugs submitted successfully!", Toast.LENGTH_LONG).show()
@@ -377,22 +418,18 @@ class ReportBugFormFragment : Fragment() {
                         .setPositiveButton("Retry", null)
                         .show()
                 }
-                else -> {
-                    setLoading(false)
-                }
+                else -> setLoading(false)
             }
         }
 
         viewModel.isAnyUploadInProgress.observe(viewLifecycleOwner) { isAnyLoading ->
-            // Prevent global submission if any bug (current or draft) is still processing
             binding.btnSubmitAll.isEnabled = !isAnyLoading
-            if (isAnyLoading) {
-                binding.btnSubmitAll.alpha = 0.5f
-                if (viewModel.submissionState.value is ReportBugViewModel.SubmissionState.Submitting) {
-                    binding.btnSubmitAll.text = "Uploading Evidence..."
-                }
-            } else {
-                binding.btnSubmitAll.alpha = 1.0f
+            binding.btnSubmitAll.alpha     = if (isAnyLoading) 0.5f else 1.0f
+            if (isAnyLoading &&
+                viewModel.submissionState.value is ReportBugViewModel.SubmissionState.Submitting
+            ) {
+                binding.btnSubmitAll.text = "Uploading Evidence..."
+            } else if (!isAnyLoading) {
                 binding.btnSubmitAll.text = "Submit All Bugs"
             }
         }
@@ -402,21 +439,19 @@ class ReportBugFormFragment : Fragment() {
         }
 
         viewModel.currentCachedUri.observe(viewLifecycleOwner) { uri ->
-             if (uri != null) {
+            if (uri != null) {
                 binding.ivScreenshotPreview.setImageURI(uri)
                 binding.attachmentPlaceholder.visibility = View.GONE
-                binding.ivScreenshotPreview.visibility = View.VISIBLE
-                binding.ivDeleteScreenshot.visibility = View.VISIBLE
-                
-                binding.ivScreenshotPreview.setOnClickListener {
-                    showFullscreenImage(uri)
-                }
-            }
-             else {
+                binding.ivScreenshotPreview.visibility   = View.VISIBLE
+                binding.ivDeleteScreenshot.visibility    = View.VISIBLE
+                binding.ivScreenshotPreview.setOnClickListener { showFullscreenImage(uri) }
+                updateProgressBar()
+            } else {
                 binding.ivScreenshotPreview.setImageDrawable(null)
                 binding.attachmentPlaceholder.visibility = View.VISIBLE
-                binding.ivScreenshotPreview.visibility = View.GONE
-                binding.ivDeleteScreenshot.visibility = View.GONE
+                binding.ivScreenshotPreview.visibility   = View.GONE
+                binding.ivDeleteScreenshot.visibility    = View.GONE
+                updateProgressBar()
             }
         }
 
@@ -425,9 +460,11 @@ class ReportBugFormFragment : Fragment() {
                 Snackbar.make(binding.root, "Attachment Error: $error", Snackbar.LENGTH_LONG).show()
             }
         }
-
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // Helpers
+    // ─────────────────────────────────────────────────────────────────────────
     private fun validateForm(showErrors: Boolean = true): Boolean {
         var valid = true
 
@@ -455,30 +492,26 @@ class ReportBugFormFragment : Fragment() {
         return valid
     }
 
-    private fun getSelectedSeverity(): String {
-        return when (binding.togglePriority.checkedButtonId) {
-            R.id.btnLow -> BugReport.SEVERITY_LOW
-            R.id.btnMed -> BugReport.SEVERITY_MEDIUM
-            R.id.btnHigh -> BugReport.SEVERITY_HIGH
-            R.id.btnCrit -> BugReport.SEVERITY_CRITICAL
-            else -> BugReport.SEVERITY_LOW
-        }
+    private fun getSelectedSeverity(): String = when (binding.togglePriority.checkedButtonId) {
+        R.id.btnLow  -> BugReport.SEVERITY_LOW
+        R.id.btnMed  -> BugReport.SEVERITY_MEDIUM
+        R.id.btnHigh -> BugReport.SEVERITY_HIGH
+        R.id.btnCrit -> BugReport.SEVERITY_CRITICAL
+        else         -> BugReport.SEVERITY_LOW
     }
 
-    private fun getStepsString(): String {
-        return stepViews
-            .mapIndexed { i, et -> "${i + 1}. ${et.text.toString().trim()}" }
-            .filter { it.substringAfter(". ").isNotBlank() }
-            .joinToString("\n")
-    }
+    private fun getStepsString(): String = stepRows
+        .mapIndexed { i, row -> "${i + 1}. ${row.editText.text.toString().trim()}" }
+        .filter { it.substringAfter(". ").isNotBlank() }
+        .joinToString("\n")
 
     private fun addCurrentBugToDraft() {
         viewModel.addBugToDraft(
-            title = binding.etBugTitle.text.toString().trim(),
-            component = binding.atvComponent.text.toString().trim(),
-            severity = getSelectedSeverity(),
+            title       = binding.etBugTitle.text.toString().trim(),
+            component   = binding.atvComponent.text.toString().trim(),
+            severity    = getSelectedSeverity(),
             description = binding.etDescription.text.toString().trim(),
-            steps = getStepsString().ifBlank { null }
+            steps       = getStepsString().ifBlank { null }
         )
     }
 
@@ -488,43 +521,40 @@ class ReportBugFormFragment : Fragment() {
             setImageURI(uri)
             adjustViewBounds = true
         }
-        
         com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
             .setView(imageView)
             .setPositiveButton("Close", null)
             .show()
-
     }
 
     private fun resetForm() {
-        binding.etBugTitle.text = null
+        binding.etBugTitle.text    = null
         binding.etDescription.text = null
-        if (binding.atvComponent.isEnabled) {
-            binding.atvComponent.text = null
-        }
+        if (binding.atvComponent.isEnabled) binding.atvComponent.text = null
 
-        // Reset steps
-        stepViews.clear()
+        stepRows.clear()
         binding.llStepsContainer.removeAllViews()
         addStepRow(binding.llStepsContainer, 1)
+        refreshStepDeleteIcons()
 
-        // Reset priority to HIGH
         binding.togglePriority.check(R.id.btnLow)
 
         binding.ivScreenshotPreview.setImageDrawable(null)
         binding.attachmentPlaceholder.visibility = View.VISIBLE
-        binding.ivScreenshotPreview.visibility = View.GONE
+        binding.ivScreenshotPreview.visibility   = View.GONE
 
-        binding.tilBugTitle.error = null
-        binding.tilComponent.error = null
+        binding.tilBugTitle.error    = null
+        binding.tilComponent.error   = null
         binding.tilDescription.error = null
+
+        updateProgressBar()
     }
 
     private fun setLoading(loading: Boolean) {
-        binding.btnSubmitAll.isEnabled = !loading
-        binding.btnAddAnotherBug.isEnabled = !loading
-        binding.btnCancel.isEnabled = !loading
-        binding.btnSubmitAll.text = if (loading) "Submitting..." else "Submit All Bugs"
+        binding.btnSubmitAll.isEnabled       = !loading
+        binding.toolbar.btnAddAnotherBug.isEnabled   = !loading
+        binding.btnCancel.isEnabled          = !loading
+        binding.btnSubmitAll.text            = if (loading) "Submitting..." else "Submit All Bugs"
     }
 
     override fun onDestroyView() {

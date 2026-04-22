@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:type="linear"
+        android:angle="0"
+        android:startColor="@color/primary"
+        android:endColor="@color/primary_variant" />
+    <!-- If you don't have primary_variant, use a slightly lighter/darker
+         tint of your primary, e.g. #7C4DFF when primary is #6200EE -->
+</shape>
