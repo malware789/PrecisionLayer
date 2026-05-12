@@ -52,7 +52,7 @@ class BugListFragment : Fragment() {
     }
 
     private fun setupUI() {
-        binding.tvHeaderTitle.text = "Bugs for ${args.testerName}"
+        binding.tvHeaderTitle.text = "Bugs from ${args.testerName}"
         binding.tvHeaderAvatar.text = args.testerName.getInitials()
         
         adapter = BugReportAdapter(emptyList()) { bug ->

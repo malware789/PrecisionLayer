@@ -3,7 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/bg_header_gradient"
+
+    >
     <!-- Top row: title + badge + Add Bug button -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,6 +27,7 @@
             app:cardElevation="3dp"
             android:elevation="5dp"
             android:layout_marginEnd="15dp"
+
             >
 
             <ImageView
@@ -93,7 +97,7 @@
             android:paddingHorizontal="14dp"
             app:strokeColor="#66FFFFFF"
             app:cornerRadius="18dp"
-            android:backgroundTint="#33FFFFFF" />
+            android:backgroundTint="#59EFEFEF" />
 
     </LinearLayout>
 
