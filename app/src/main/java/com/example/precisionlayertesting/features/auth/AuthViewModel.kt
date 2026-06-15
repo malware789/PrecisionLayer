@@ -27,8 +27,8 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
     private val _invitationsState = MutableLiveData<Result<List<Invitation>>>()
     val invitationsState: LiveData<Result<List<Invitation>>> = _invitationsState
 
-    private val _invitationActionState = MutableLiveData<Result<Unit>>()
-    val invitationActionState: LiveData<Result<Unit>> = _invitationActionState
+    private val _invitationActionState = MutableLiveData<Result<String>>()
+    val invitationActionState: LiveData<Result<String>> = _invitationActionState
 
     private val _createWorkspaceState = MutableLiveData<Result<Unit>>()
     val createWorkspaceState: LiveData<Result<Unit>> = _createWorkspaceState
@@ -39,6 +39,10 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
 
     private val _currentWorkspaceName = MutableLiveData<String?>()
     val currentWorkspaceName: LiveData<String?> = _currentWorkspaceName
+
+    // Authenticated Session State (userId to email)
+    private val _currentSession = MutableLiveData<Pair<String?, String?>>()
+    val currentSession: LiveData<Pair<String?, String?>> = _currentSession
 
     fun loginWithEmailPassword(request: LoginRequest) {
         _loginState.value = Result.Loading
@@ -79,11 +83,13 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
         if (currentWS != null) {
             _currentWorkspaceName.value = currentWS.workspace.name
             repository.getPrefs().setWorkspaceName(currentWS.workspace.name)
+            repository.getPrefs().saveUserRole(currentWS.role)
         } else {
             // Auto-select first if none saved or saved one was deleted/removed
             val first = workspaces.first()
             repository.getPrefs().saveWorkspaceId(first.workspaceId)
             repository.getPrefs().setWorkspaceName(first.workspace.name)
+            repository.getPrefs().saveUserRole(first.role)
             _currentWorkspaceName.value = first.workspace.name
         }
     }
@@ -91,6 +97,7 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
     fun switchWorkspace(workspace: WorkspaceMemberDetailed) {
         repository.getPrefs().saveWorkspaceId(workspace.workspaceId)
         repository.getPrefs().setWorkspaceName(workspace.workspace.name)
+        repository.getPrefs().saveUserRole(workspace.role)
         _currentWorkspaceName.value = workspace.workspace.name
     }
 
@@ -111,14 +118,24 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
     fun acceptInvitation(userId: String, invitation: Invitation) {
         _invitationActionState.value = Result.Loading
         viewModelScope.launch {
-            _invitationActionState.value = repository.acceptInvitation(userId, invitation)
+            val result = repository.acceptInvitation(userId, invitation)
+            if (result is Result.Success) {
+                _invitationActionState.value = Result.Success("ACCEPT")
+            } else if (result is Result.Error) {
+                _invitationActionState.value = Result.Error(result.exception)
+            }
         }
     }
 
     fun rejectInvitation(invitationId: String) {
         _invitationActionState.value = Result.Loading
         viewModelScope.launch {
-            _invitationActionState.value = repository.rejectInvitation(invitationId)
+            val result = repository.rejectInvitation(invitationId)
+            if (result is Result.Success) {
+                _invitationActionState.value = Result.Success("REJECT")
+            } else if (result is Result.Error) {
+                _invitationActionState.value = Result.Error(result.exception)
+            }
         }
     }
 
@@ -131,5 +148,13 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
     
     fun logout() {
         repository.getPrefs().clearAll()
+    }
+
+    /**
+     * Loads the authenticated user's userId and email from the local session (SharedPreferences).
+     * Posts the pair to [currentSession]. Fragments should call this in onViewCreated.
+     */
+    fun loadCurrentSession() {
+        _currentSession.value = repository.getCurrentSession()
     }
 }

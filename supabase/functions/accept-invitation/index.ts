@@ -65,17 +65,38 @@ serve(async (req) => {
     }
 
     // 2. Verification
-    if (invitation.status !== 'pending') {
-      return new Response(JSON.stringify({ error: `Invitation is ${invitation.status}` }), {
+    if (invitation.email !== user.email) {
+      return new Response(JSON.stringify({ error: 'Email mismatch' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 403,
+      })
+    }
+
+    if (invitation.status === 'accepted') {
+      return new Response(JSON.stringify({ success: true, workspace_id: invitation.workspace_id, message: 'Already accepted' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      })
+    }
+
+    if (invitation.status === 'revoked') {
+      return new Response(JSON.stringify({ error: 'Invitation is revoked' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
       })
     }
 
-    if (invitation.email !== user.email) {
-      return new Response(JSON.stringify({ error: 'Email mismatch' }), {
+    if (invitation.status === 'expired') {
+      return new Response(JSON.stringify({ error: 'Invitation expired' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 403,
+        status: 400,
+      })
+    }
+
+    if (invitation.status !== 'pending') {
+      return new Response(JSON.stringify({ error: `Invitation is ${invitation.status}` }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
       })
     }
 
@@ -88,7 +109,22 @@ serve(async (req) => {
       })
     }
 
-    // 3. Verify user is not already a member
+    // 3. Ensure profile exists before establishing foreign keys
+    // This safely mirrors the auth.users identity into public.profiles
+    const { error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .upsert({ 
+        id: user.id, 
+        email: user.email 
+      }, { 
+        onConflict: 'id' 
+      })
+
+    if (profileError) {
+      throw profileError
+    }
+
+    // 4. Verify user is not already a member
     const { data: existingMember, error: existingMemberError } = await supabaseAdmin
       .from('workspace_members')
       .select('role')
@@ -96,26 +132,20 @@ serve(async (req) => {
       .eq('user_id', user.id)
       .maybeSingle()
 
-    if (existingMember) {
-      // Option A approach: Gracefully handle duplicate by returning a specific error
-      return new Response(JSON.stringify({ error: 'already_member' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 409,
-      })
-    }
+    // 5. Execution
+    if (!existingMember) {
+      // Insert into workspace_members
+      const { error: memberError } = await supabaseAdmin
+        .from('workspace_members')
+        .insert({
+          workspace_id: invitation.workspace_id,
+          user_id: user.id,
+          role: invitation.role
+        })
 
-    // 4. Execution
-    // Insert into workspace_members
-    const { error: memberError } = await supabaseAdmin
-      .from('workspace_members')
-      .insert({
-        workspace_id: invitation.workspace_id,
-        user_id: user.id,
-        role: invitation.role
-      })
-
-    if (memberError) {
-      throw memberError
+      if (memberError) {
+        throw memberError
+      }
     }
 
     // Update invitation

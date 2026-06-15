@@ -6,6 +6,7 @@ import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import com.example.precisionlayertesting.core.remote.R2ApiService
 import android.content.Context
@@ -120,7 +121,7 @@ class BugRepository(
         onProgress: (Long, Long) -> Unit
     ): Result<Unit> = withContext(Dispatchers.IO) {
         try {
-            val mediaType = MediaType.parse(mimeType)
+            val mediaType = mimeType.toMediaTypeOrNull()
             val requestBody = ProgressRequestBody(mediaType, data, onProgress)
             
             val response = r2ApiService.uploadFile(
@@ -165,7 +166,7 @@ class BugRepository(
                 -1L
             }
 
-            val mediaType = MediaType.parse(mimeType)
+            val mediaType = mimeType.toMediaTypeOrNull()
             val requestBody = StreamingProgressRequestBody(
                 context = context,
                 uri = uri,
@@ -311,7 +312,7 @@ class BugRepository(
             try {
                 if (attempt > 0) Log.d(TAG, "Retrying upload... Attempt $attempt")
                 
-                val mediaType = MediaType.parse("application/vnd.android.package-archive")
+                val mediaType = "application/vnd.android.package-archive".toMediaTypeOrNull()
                 val requestBody = ProgressRequestBody(mediaType, data, onProgress)
                 
                 // Use a direct PUT request without explicit header if it might conflict with signature

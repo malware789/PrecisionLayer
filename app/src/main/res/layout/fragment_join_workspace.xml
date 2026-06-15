@@ -102,6 +102,17 @@
                 android:textStyle="bold"
                 app:backgroundTint="#0F172A"
                 app:cornerRadius="12dp" />
+
+            <TextView
+                android:id="@+id/tvRedirecting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="Redirecting to workspace..."
+                android:textColor="#64748B"
+                android:textSize="16sp"
+                android:textStyle="italic"
+                android:visibility="gone" />
         </LinearLayout>
 
         <!-- Loading State -->

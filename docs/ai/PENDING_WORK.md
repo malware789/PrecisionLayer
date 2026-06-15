@@ -6,8 +6,8 @@
 - [ ] **Follow-up**: Ensure UI/UX gracefully handles network errors if appending a bug to an existing session fails.
 
 ## 🔜 Next Phase Pending Work
-- [ ] **Role System (Phase 2+)**: Implement backend enforcement and dynamic permission toggles (UI Skeleton completed).
-- [ ] **Invitation System (Phase 2+)**: Implement backend logic for sending and accepting workspace invitations (UI Skeleton completed).
+- [ ] **Role System (Phase 2+)**: Implement backend enforcement and dynamic permission toggles (UI Skeleton completed, RLS schema in place).
+- [x] **Invitation System (Phase 2)**: Backend + Android client fully implemented. `workspace_invitations` table, `accept-invitation` Edge Function, `InviteTeamMembersFragment` wired, `JoinWorkspaceFragment` using real session. ✅
 - [ ] **Profile Flow Improvements**: Enhance user profile management screens.
 - [ ] **Activity Screen**: Build out a better global Activity feed screen.
 - [ ] **Analytics Dashboard**: (Deferred) Visual metrics for bug frequency, testing sessions, etc.

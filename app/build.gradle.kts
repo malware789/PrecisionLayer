@@ -30,6 +30,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -53,6 +54,9 @@ dependencies {
     // Retrofit & Gson
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+
+    // OkHttp logging interceptor — for raw request/response debugging
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     // Lifecycle components for viewModelScope
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2")

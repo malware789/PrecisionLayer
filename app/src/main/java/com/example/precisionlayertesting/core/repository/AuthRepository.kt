@@ -23,6 +23,7 @@ class AuthRepository(
                 val body = response.body()
                 if (body != null) {
                     prefsManager.saveUserId(body.user.id)
+                    prefsManager.saveUserEmail(body.user.email)
                     prefsManager.saveAccessToken(body.accessToken)
                     prefsManager.saveRefreshToken(body.refreshToken)
                     Result.Success(body)
@@ -44,6 +45,7 @@ class AuthRepository(
                 val body = response.body()
                 if (body != null) {
                     prefsManager.saveUserId(body.user.id)
+                    prefsManager.saveUserEmail(body.user.email)
                     prefsManager.saveAccessToken(body.accessToken)
                     prefsManager.saveRefreshToken(body.refreshToken)
                     createProfile(ProfileRequest(id = body.user.id, email = body.user.email))
@@ -214,6 +216,14 @@ class AuthRepository(
 
     suspend fun getDetailedWorkspaces(userId: String): List<WorkspaceMemberDetailed> {
         return authApiService.getUserWorkspacesDetailed("eq.$userId")
+    }
+
+    /**
+     * Returns the currently authenticated user's id and email from the local session.
+     * Returns null for either field if the session has not been established yet.
+     */
+    fun getCurrentSession(): Pair<String?, String?> {
+        return Pair(prefsManager.getUserId(), prefsManager.getUserEmail())
     }
 
     fun getPrefs() = prefsManager

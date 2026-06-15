@@ -1,11 +1,13 @@
 package com.example.precisionlayertesting.core.network
 
+import com.example.precisionlayertesting.BuildConfig
 import com.example.precisionlayertesting.core.di.ManualDI
 import okhttp3.Authenticator
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.Route
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
@@ -23,7 +25,7 @@ object RetrofitClient {
     private val tokenAuthenticator = object : Authenticator {
         override fun authenticate(route: Route?, response: Response): Request? {
             // Prevent infinite retry loops — give up after 2 attempts
-            if (response.priorResponse()?.code() == 401) return null
+            if (response.priorResponse?.code == 401) return null
 
             val refreshToken = try {
                 ManualDI.prefsManager.getRefreshToken()
@@ -39,7 +41,7 @@ object RetrofitClient {
                     ManualDI.prefsManager.saveAccessToken(refreshResponse.access_token)
                     ManualDI.prefsManager.saveRefreshToken(refreshResponse.refresh_token)
                     // Retry original request with new token
-                    response.request().newBuilder()
+                    response.request.newBuilder()
                         .header("Authorization", "Bearer ${refreshResponse.access_token}")
                         .build()
                 } else {
@@ -74,6 +76,16 @@ object RetrofitClient {
         .authenticator(tokenAuthenticator)
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
+        .apply {
+            // Raw HTTP logging — only in debug builds. Filter Logcat by "OkHttp" to see
+            // exact request URL, headers, and response body for invitation queries.
+            if (BuildConfig.DEBUG) {
+                val loggingInterceptor = HttpLoggingInterceptor().apply {
+                    level = HttpLoggingInterceptor.Level.BODY
+                }
+                addInterceptor(loggingInterceptor)
+            }
+        }
         .build()
 
     val retrofit: Retrofit by lazy {
