@@ -254,9 +254,7 @@ class ReportBugViewModel(
                 }
 
                 // 1. Determine Session
-                val finalSessionId = if (sessionId != null) {
-                    sessionId
-                } else {
+                val finalSessionId = sessionId?.takeIf { it.isNotBlank() } ?: run {
                     val sessionRequest = TestingSessionCreateRequest(
                         workspaceId = workspaceId,
                         versionId = versionId,

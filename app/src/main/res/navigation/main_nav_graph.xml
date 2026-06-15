@@ -165,4 +165,16 @@
         android:label="Create Module"
         tools:layout="@layout/fragment_create_module" />
 
+    <fragment
+        android:id="@+id/nav_invite_team_members"
+        android:name="com.example.precisionlayertesting.features.management.InviteTeamMembersFragment"
+        android:label="Invite Team Members"
+        tools:layout="@layout/fragment_invite_team_members" />
+
+    <fragment
+        android:id="@+id/nav_roles_permissions"
+        android:name="com.example.precisionlayertesting.features.management.RolesPermissionsFragment"
+        android:label="Roles &amp; Permissions"
+        tools:layout="@layout/fragment_roles_permissions" />
+
 </navigation>

@@ -51,6 +51,11 @@ class BugListFragment : Fragment() {
         observeViewModel()
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadBugs(refresh = true)
+    }
+
     private fun setupUI() {
         binding.tvHeaderTitle.text = "Bugs from ${args.testerName}"
         binding.tvHeaderAvatar.text = args.testerName.getInitials()
@@ -68,7 +73,14 @@ class BugListFragment : Fragment() {
         binding.rvBugReports.adapter = adapter
         
         binding.fabAddBug.setOnClickListener {
-             Toast.makeText(requireContext(), "Coming soon", Toast.LENGTH_SHORT).show()
+             val action = BugListFragmentDirections.actionBugListFragmentToReportBugFormFragment(
+                 moduleId = args.moduleId,
+                 versionId = args.versionId,
+                 moduleName = args.moduleName,
+                 versionName = args.versionName,
+                 sessionId = args.sessionId
+             )
+             findNavController().navigate(action)
         }
     }
 

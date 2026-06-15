@@ -19,12 +19,6 @@ class ApkMetadataExtractor(private val context: Context) {
         private const val TAG = "ApkMetadataExtractor"
     }
 
-    /**
-     * Extracts metadata from an APK file.
-     * @param uri The Uri of the selected APK file.
-     * @return ApkMetadata if successful, null otherwise.
-     */
-
     fun extract(uri: Uri): ApkMetadata? {
         var tempFile: File? = null
         return try {

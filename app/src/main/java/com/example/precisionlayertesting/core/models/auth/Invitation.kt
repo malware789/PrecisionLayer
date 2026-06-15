@@ -8,9 +8,12 @@ data class Invitation(
     @SerializedName("email") val email: String,
     @SerializedName("role") val role: String,
     @SerializedName("status") val status: String,
-    @SerializedName("invited_by") val invitedBy: String? = null,
+    @SerializedName("invited_by") val invitedBy: String,
+    @SerializedName("accepted_by") val acceptedBy: String? = null,
+    @SerializedName("accepted_at") val acceptedAt: String? = null,
+    @SerializedName("expires_at") val expiresAt: String? = null,
     @SerializedName("created_at") val createdAt: String? = null,
-    // Join with workspaces table if possible, but for now we might need a separate call or a query
+    @SerializedName("updated_at") val updatedAt: String? = null,
     @SerializedName("workspaces") val workspace: WorkspaceInfo? = null
 )
 

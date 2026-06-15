@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/surface"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="28dp"
+        android:paddingBottom="32dp">
+
+        <!-- ── Header ─────────────────────────────────────────────────── -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Invite Collaborators"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:letterSpacing="-0.02"
+            android:textColor="@color/on_surface" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Expand your testing workspace and bring your engineers into the loop."
+            android:textSize="14sp"
+            android:lineSpacingMultiplier="1.4"
+            android:textColor="@color/on_surface_variant"
+            android:layout_marginTop="6dp" />
+
+        <!-- ── Invite Card ────────────────────────────────────────────── -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            app:cardBackgroundColor="@color/surface_container_lowest"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <!-- Email label -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="EMAIL ADDRESS"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.1"
+                    android:textColor="@color/on_surface_variant" />
+
+                <!-- Email Input -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilEmail"
+                    style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    app:boxBackgroundColor="@color/surface_container_low"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:boxStrokeWidth="0dp"
+                    app:boxStrokeWidthFocused="0dp"
+                    app:hintTextColor="@color/outline"
+                    app:hintEnabled="true">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textEmailAddress"
+                        android:textColor="@color/on_surface"
+                        android:hint="e.g., m.kinsley@architect.io"
+                        android:textSize="15sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Assign Role label -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="ASSIGN ROLE"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.1"
+                    android:textColor="@color/on_surface_variant" />
+
+                <!-- Role pill buttons row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="10dp">
+
+                    <!-- Tester (selected) -->
+                    <LinearLayout
+                        android:id="@+id/chipTester"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="10dp"
+                        android:background="@drawable/bg_chip_role_selected">
+
+                        <ImageView
+                            android:id="@+id/icTesterCheck"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_add"
+                            android:tint="@color/on_primary"
+                            android:layout_marginEnd="6dp"
+                            android:visibility="visible" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tester"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/on_primary" />
+                    </LinearLayout>
+
+                    <!-- Developer -->
+                    <TextView
+                        android:id="@+id/chipDeveloper"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="10dp"
+                        android:text="Developer"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/on_surface_variant"
+                        android:background="@drawable/bg_chip_role_unselected" />
+
+                    <!-- Manager -->
+                    <TextView
+                        android:id="@+id/chipManager"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="10dp"
+                        android:text="Manager"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/on_surface_variant"
+                        android:background="@drawable/bg_chip_role_unselected" />
+
+                    <!-- QA -->
+                    <TextView
+                        android:id="@+id/chipQA"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="10dp"
+                        android:text="QA"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/on_surface_variant"
+                        android:background="@drawable/bg_chip_role_unselected" />
+                </LinearLayout>
+
+                <!-- Send Invitation Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSendInvitation"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:layout_marginTop="24dp"
+                    android:text="Send Invitation"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/on_primary"
+                    app:icon="@drawable/ic_send_24"
+                    app:iconGravity="textEnd"
+                    app:iconTint="@color/on_primary"
+                    app:iconSize="20dp"
+                    app:backgroundTint="@color/primary"
+                    app:cornerRadius="14dp"
+                    app:elevation="4dp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ── Recently Invited ───────────────────────────────────────── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Recently Invited"
+                android:textSize="19sp"
+                android:textStyle="bold"
+                android:letterSpacing="-0.01"
+                android:textColor="@color/on_surface" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3 Total Pending"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="@color/outline" />
+        </LinearLayout>
+
+        <!-- Invited Row 1: Julianne Smith -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingVertical="12dp"
+            android:paddingHorizontal="4dp">
+
+            <!-- Avatar circle JS -->
+            <TextView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:text="JS"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/avatar_text_blue"
+                android:gravity="center"
+                android:background="@drawable/bg_avatar_blue" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Julianne Smith"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/on_surface" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="j.smith@quality.tech"
+                    android:textSize="12sp"
+                    android:textColor="@color/outline" />
+            </LinearLayout>
+
+            <!-- Pending badge -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="6dp"
+                android:background="@drawable/bg_pending_badge">
+
+                <View
+                    android:layout_width="7dp"
+                    android:layout_height="7dp"
+                    android:background="@drawable/bg_dot_tertiary"
+                    android:layout_marginEnd="5dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="PENDING"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.06"
+                    android:textColor="@color/tertiary" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/surface_container_high"
+            android:layout_marginHorizontal="4dp" />
+
+        <!-- Invited Row 2: Marcus Kinsley -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingVertical="12dp"
+            android:paddingHorizontal="4dp">
+
+            <TextView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:text="MK"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/avatar_text_purple"
+                android:gravity="center"
+                android:background="@drawable/bg_avatar_purple" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Marcus Kinsley"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/on_surface" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="marcus.k@arch-lab.io"
+                    android:textSize="12sp"
+                    android:textColor="@color/outline" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="6dp"
+                android:background="@drawable/bg_pending_badge">
+
+                <View
+                    android:layout_width="7dp"
+                    android:layout_height="7dp"
+                    android:background="@drawable/bg_dot_tertiary"
+                    android:layout_marginEnd="5dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="PENDING"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.06"
+                    android:textColor="@color/tertiary" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Divider -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/surface_container_high"
+            android:layout_marginHorizontal="4dp" />
+
+        <!-- Invited Row 3: Elena Lopez -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingVertical="12dp"
+            android:paddingHorizontal="4dp">
+
+            <TextView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:text="EL"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/avatar_text_green"
+                android:gravity="center"
+                android:background="@drawable/bg_avatar_green" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Elena Lopez"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/on_surface" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="elopez@devsuite.com"
+                    android:textSize="12sp"
+                    android:textColor="@color/outline" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="6dp"
+                android:background="@drawable/bg_pending_badge">
+
+                <View
+                    android:layout_width="7dp"
+                    android:layout_height="7dp"
+                    android:background="@drawable/bg_dot_tertiary"
+                    android:layout_marginEnd="5dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="PENDING"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.06"
+                    android:textColor="@color/tertiary" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ── Info Bento Cards ───────────────────────────────────────── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="24dp">
+
+            <!-- Team Scaling card -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="110dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="bottom"
+                android:padding="16dp"
+                android:background="@drawable/bg_info_card_surface">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Team Scaling"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Invitations are valid for 72 hours before they expire."
+                    android:textSize="11sp"
+                    android:lineSpacingMultiplier="1.3"
+                    android:textColor="@color/on_surface_variant"
+                    android:layout_marginTop="3dp" />
+            </LinearLayout>
+
+            <!-- Secure Access card -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="110dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="bottom"
+                android:padding="16dp"
+                android:layout_marginStart="12dp"
+                android:background="@drawable/bg_info_card_primary">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Secure Access"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Roles define specific permissions across testing suites."
+                    android:textSize="11sp"
+                    android:lineSpacingMultiplier="1.3"
+                    android:textColor="@color/on_surface_variant"
+                    android:layout_marginTop="3dp" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

@@ -88,6 +88,12 @@ class MainActivity : AppCompatActivity() {
                 R.id.nav_bugs -> {
                     navController.navigate(R.id.bugTrackingFragment)
                 }
+                R.id.nav_invite_team_members -> {
+                    navController.navigate(R.id.nav_invite_team_members)
+                }
+                R.id.nav_roles_permissions -> {
+                    navController.navigate(R.id.nav_roles_permissions)
+                }
                 R.id.nav_logout -> {
                     performLogout()
                 }
@@ -171,6 +177,22 @@ class MainActivity : AppCompatActivity() {
                 useDrawerIcon = false
             )
 
+            R.id.nav_invite_team_members -> ToolbarConfig(
+                title = "Invite Team Members",
+                subtitle = null,
+                showBottomNav = false,
+                showWorkspaceSwitcher = false,
+                useDrawerIcon = true
+            )
+
+            R.id.nav_roles_permissions -> ToolbarConfig(
+                title = "Roles & Permissions",
+                subtitle = null,
+                showBottomNav = false,
+                showWorkspaceSwitcher = false,
+                useDrawerIcon = true
+            )
+
             R.id.reportBugFormFragment -> ToolbarConfig(
                 title = "Report Bug",
                 subtitle = "Add issue details",
@@ -222,7 +244,9 @@ class MainActivity : AppCompatActivity() {
         return destinationId in setOf(
             R.id.dashboardFragment,
             R.id.moduleVersionsFragment,
-            R.id.bugTrackingFragment
+            R.id.bugTrackingFragment,
+            R.id.nav_invite_team_members,
+            R.id.nav_roles_permissions
         )
     }
 

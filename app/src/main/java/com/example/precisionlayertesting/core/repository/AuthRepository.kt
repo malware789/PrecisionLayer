@@ -98,26 +98,27 @@ class AuthRepository(
 
     suspend fun acceptInvitation(userId: String, invitation: Invitation): Result<Unit> {
         return try {
-            val memberData = mapOf(
-                "user_id" to userId,
-                "workspace_id" to invitation.workspaceId,
-                "role" to invitation.role
+            val response = authApiService.acceptInvitationEdgeFunction(
+                mapOf("invitation_id" to invitation.id)
             )
-            val addResponse = authApiService.addWorkspaceMember(memberData)
-            
-            if (addResponse.isSuccessful) {
-                val updateResponse = authApiService.updateInvitationStatus(
-                    "eq.${invitation.id}",
-                    mapOf("status" to "accepted")
-                )
-                if (updateResponse.isSuccessful) {
-                    prefsManager.saveWorkspaceId(invitation.workspaceId)
-                    Result.Success(Unit)
-                } else {
-                    Result.Error(Exception("Failed to update invitation status"))
+            if (response.isSuccessful) {
+                // Read workspace_id from response and save it
+                val body = response.body()
+                val workspaceId = body?.get("workspace_id") as? String
+                if (workspaceId != null) {
+                    prefsManager.saveWorkspaceId(workspaceId)
                 }
+                Result.Success(Unit)
             } else {
-                Result.Error(Exception("Failed to join workspace: ${addResponse.code()}"))
+                val errorBody = response.errorBody()?.string() ?: ""
+                val msg = if (errorBody.contains("already_member")) {
+                    "You are already a member of this workspace"
+                } else if (errorBody.contains("expired")) {
+                    "This invitation has expired"
+                } else {
+                    "Failed to accept invitation: ${response.code()}"
+                }
+                Result.Error(Exception(msg))
             }
         } catch (e: Exception) {
             Result.Error(e)
@@ -128,12 +129,32 @@ class AuthRepository(
         return try {
             val response = authApiService.updateInvitationStatus(
                 "eq.$invitationId",
-                mapOf("status" to "rejected")
+                mapOf("status" to "revoked", "updated_at" to java.time.Instant.now().toString())
             )
             if (response.isSuccessful) {
                 Result.Success(Unit)
             } else {
                 Result.Error(Exception("Failed to reject invitation"))
+            }
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
+    }
+
+    suspend fun createInvitation(workspaceId: String, email: String, role: String, invitedBy: String): Result<Unit> {
+        return try {
+            val response = authApiService.createInvitation(
+                mapOf(
+                    "workspace_id" to workspaceId,
+                    "email" to email,
+                    "role" to role,
+                    "invited_by" to invitedBy
+                )
+            )
+            if (response.isSuccessful) {
+                Result.Success(Unit)
+            } else {
+                Result.Error(Exception("Failed to send invitation"))
             }
         } catch (e: Exception) {
             Result.Error(e)

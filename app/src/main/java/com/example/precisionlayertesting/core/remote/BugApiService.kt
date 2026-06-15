@@ -45,7 +45,7 @@ interface BugApiService {
     suspend fun getBugGroups(
         @Query("version_id") versionId: String,
         @Query("workspace_id") workspaceId: String,
-        @Query("select") select: String = "*,profiles(full_name,email),bug_reports(count)",
+        @Query("select") select: String = "*,profiles(full_name,email),bug_reports!bug_reports_session_workspace_fkey(count)",
         @Query("order") order: String = "created_at.desc"
     ): List<TestingSession>
 

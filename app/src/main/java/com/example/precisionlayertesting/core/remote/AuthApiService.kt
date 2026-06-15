@@ -39,18 +39,28 @@ interface AuthApiService {
         @Query("select") select: String = "*"
     ): List<WorkspaceMember>
 
-    @GET("rest/v1/invitations")
+    @GET("rest/v1/workspace_invitations")
     suspend fun getPendingInvitations(
         @Query("email") emailFilter: String,
         @Query("status") statusFilter: String = "eq.pending",
         @Query("select") select: String = "*,workspaces(name)"
     ): List<Invitation>
 
-    @PATCH("rest/v1/invitations")
+    @PATCH("rest/v1/workspace_invitations")
     suspend fun updateInvitationStatus(
         @Query("id") idFilter: String,
         @Body statusUpdate: Map<String, String>
     ): Response<Unit>
+
+    @POST("rest/v1/workspace_invitations")
+    suspend fun createInvitation(
+        @Body invitation: Map<String, String>
+    ): Response<Unit>
+
+    @POST("functions/v1/accept-invitation")
+    suspend fun acceptInvitationEdgeFunction(
+        @Body request: Map<String, String>
+    ): Response<Map<String, Any>>
 
     @POST("rest/v1/workspace_members")
     suspend fun addWorkspaceMember(

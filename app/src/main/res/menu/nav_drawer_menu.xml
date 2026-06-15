@@ -13,6 +13,20 @@
             android:icon="@drawable/shadow_profile"
             android:title="Profile" />
     </group>
+    <item android:title="Workspace Management">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/nav_invite_team_members"
+                    android:icon="@drawable/ic_person_add"
+                    android:title="Invite Team Members" />
+                <item
+                    android:id="@+id/nav_roles_permissions"
+                    android:icon="@drawable/ic_admin_panel_settings"
+                    android:title="Roles &amp; Permissions" />
+            </group>
+        </menu>
+    </item>
 
     <item android:title="Account">
         <menu>
